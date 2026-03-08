@@ -1,5 +1,7 @@
 "use client";
 
+import { signOut } from "@/app/auth/actions";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -41,8 +43,8 @@ export function Sidebar() {
                             key={link.name}
                             href={link.href}
                             className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative overflow-hidden ${finalIsActive
-                                    ? "text-white bg-primary-600 shadow-md shadow-primary-600/20"
-                                    : "text-foreground/70 hover:bg-surface-hover hover:text-foreground"
+                                ? "text-white bg-primary-600 shadow-md shadow-primary-600/20"
+                                : "text-foreground/70 hover:bg-surface-hover hover:text-foreground"
                                 }`}
                         >
                             {finalIsActive && (
@@ -69,10 +71,12 @@ export function Sidebar() {
                     </button>
                 </div>
 
-                <button className="flex items-center gap-3 px-4 py-3 rounded-xl text-foreground/70 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-500/10 dark:hover:text-red-400 transition-all w-full mt-4">
-                    <LogOut size={20} />
-                    <span className="font-medium">Logout</span>
-                </button>
+                <form action={signOut}>
+                    <button type="submit" className="flex items-center gap-3 px-4 py-3 rounded-xl text-foreground/70 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-500/10 dark:hover:text-red-400 transition-all w-full mt-4">
+                        <LogOut size={20} />
+                        <span className="font-medium">Logout</span>
+                    </button>
+                </form>
             </div>
         </aside>
     );
