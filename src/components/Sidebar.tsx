@@ -12,7 +12,8 @@ import {
     Settings,
     LogOut,
     Menu,
-    X
+    X,
+    Crown,
 } from "lucide-react";
 
 export function Sidebar() {
@@ -20,10 +21,9 @@ export function Sidebar() {
     const [isOpen, setIsOpen] = useState(false);
 
     const links = [
-        { name: "Dashboard", href: "/", icon: LayoutDashboard },
-        { name: "Subscriptions", href: "/subscriptions", icon: CreditCard },
-        { name: "Participants", href: "/participants", icon: Users },
-        { name: "Settings", href: "/settings", icon: Settings },
+        { name: "Inicio", href: "/", icon: LayoutDashboard },
+        { name: "Participantes", href: "/participants", icon: Users },
+        { name: "Ajustes", href: "/settings", icon: Settings },
     ];
 
     return (
@@ -100,19 +100,21 @@ export function Sidebar() {
                 </div>
 
                 <div className="mt-8 space-y-4">
-                    <div className="p-4 rounded-xl bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 border border-primary-100 dark:border-primary-800/30 relative overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                        <div className="absolute -right-4 -top-4 w-16 h-16 bg-primary-500/10 rounded-full blur-xl animate-pulse-slow"></div>
-                        <h4 className="font-semibold text-primary-700 dark:text-primary-300 mb-1">New payment!</h4>
-                        <p className="text-sm text-primary-600/80 dark:text-primary-400/80 mb-3">Netflix is due in 3 days.</p>
-                        <button className="w-full py-2 bg-white dark:bg-surface/50 text-primary-700 dark:text-primary-400 rounded-lg text-sm font-medium shadow-sm hover:shadow hover:bg-primary-50 transition-all">
-                            Review
-                        </button>
-                    </div>
+                    <Link
+                        href="/premium"
+                        onClick={() => setIsOpen(false)}
+                        className="block p-4 rounded-xl bg-gradient-to-br from-yellow-500/10 to-amber-600/10 border border-yellow-500/20 hover:border-yellow-500/40 transition-colors"
+                    >
+                        <h4 className="font-semibold text-yellow-400 mb-1 flex items-center gap-2">
+                            <Crown size={16} /> Premium
+                        </h4>
+                        <p className="text-sm text-zinc-400">Grupos ilimitados y más funciones.</p>
+                    </Link>
 
                     <form action={signOut}>
                         <button type="submit" className="flex items-center gap-3 px-4 py-3 rounded-xl text-foreground/70 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-500/10 dark:hover:text-red-400 transition-all w-full mt-4">
                             <LogOut size={20} />
-                            <span className="font-medium">Logout</span>
+                            <span className="font-medium">Cerrar sesión</span>
                         </button>
                     </form>
                 </div>

@@ -3,65 +3,63 @@
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { getCurrentBillingPeriod, isPaidForPeriod } from '@/utils/billing-period'
+import type { GroupMember, Payment } from '@/types/database'
 
 export async function getDashboardData() {
     const supabase = await createClient()
 
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-        redirect('/login')
-    }
+    if (!user) redirect('/login')
 
-    // 1. Get User Profile (Tier info)
+    const billingPeriod = getCurrentBillingPeriod()
+
     const { data: profile } = await supabase
         .from('users')
         .select('*')
         .eq('id', user.id)
         .single()
 
-    // 2. Get Groups created by this user
     const { data: groups } = await supabase
         .from('groups')
         .select(`
             *,
             services (*),
-            group_members (*)
+            group_members (*),
+            payments (*)
         `)
         .eq('creator_id', user.id)
         .order('created_at', { ascending: false })
 
-    // 3. Get total pending payments by calculating members quota minus PAID records.
-    const { data: allUserGroups } = await supabase
-        .from('groups')
-        .select(`
-            id,
-            group_members (
-                id,
-                quota_amount
-            ),
-            payments (
-                member_id,
-                status
-            )
-        `)
-        .eq('creator_id', user.id)
+    let totalPendingAmount = 0
+    const groupsWithStats = (groups ?? []).map((group) => {
+        const members = (group.group_members ?? []) as GroupMember[]
+        const payments = (group.payments ?? []) as Payment[]
+        const paidCount = members.filter((m) =>
+            isPaidForPeriod(payments, m.id, billingPeriod)
+        ).length
+        const pendingMembers = members.filter(
+            (m) => !isPaidForPeriod(payments, m.id, billingPeriod)
+        )
+        const pendingForGroup = pendingMembers.reduce(
+            (sum, m) => sum + Number(m.quota_amount),
+            0
+        )
+        totalPendingAmount += pendingForGroup
 
-    let totalPendingAmount = 0;
-    if (allUserGroups) {
-        allUserGroups.forEach(group => {
-            group.group_members.forEach((member: any) => {
-                const isPaid = group.payments?.some((p: any) => p.member_id === member.id && p.status === 'PAID')
-                if (!isPaid) {
-                    totalPendingAmount += Number(member.quota_amount);
-                }
-            })
-        })
-    }
+        return {
+            ...group,
+            paidCount,
+            memberCount: members.length,
+            pendingForGroup,
+        }
+    })
 
     return {
         profile,
-        groups: groups || [],
+        groups: groupsWithStats,
         pendingAmountFromOthers: totalPendingAmount,
+        billingPeriod,
     }
 }
 
@@ -71,31 +69,39 @@ export async function getServices() {
     return services || []
 }
 
-// Group Creation
 export async function createSubscriptionGroup(formData: FormData) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
-    if (!user) return { error: "No autorizado" }
+    if (!user) return { error: 'No autorizado' }
 
-    // 1. Enforce Freemium Logic
     const { data: profile } = await supabase.from('users').select('tier').eq('id', user.id).single()
-    const { count } = await supabase.from('groups').select('*', { count: 'exact', head: true }).eq('creator_id', user.id)
+    const { count } = await supabase
+        .from('groups')
+        .select('*', { count: 'exact', head: true })
+        .eq('creator_id', user.id)
 
     if (profile?.tier === 'free' && (count ?? 0) >= 1) {
-        return { error: "Límite Freemium alcanzado. Actualiza a Premium para crear grupos ilimitados." }
+        return { error: 'Límite Freemium alcanzado. Actualiza a Premium para crear grupos ilimitados.' }
     }
 
-    const name = formData.get('name') as string
+    const name = (formData.get('name') as string)?.trim()
     const service_id = formData.get('service_id') as string
     const total_price = parseFloat(formData.get('total_price') as string)
-    const billing_cycle_day = parseInt(formData.get('billing_cycle_day') as string)
+    const billing_cycle_day = parseInt(formData.get('billing_cycle_day') as string, 10)
 
-    // Parse members from special input format or hardcoded array for now
-    const membersDataString = formData.get('membersData') as string
-    const members = membersDataString ? JSON.parse(membersDataString) : []
+    if (!name || !Number.isFinite(total_price) || total_price <= 0) {
+        return { error: 'Completá nombre y precio válidos.' }
+    }
 
-    // 2. Insert Group
+    let members: { name: string; whatsapp: string }[] = []
+    try {
+        const membersDataString = formData.get('membersData') as string
+        members = membersDataString ? JSON.parse(membersDataString) : []
+    } catch {
+        return { error: 'Datos de participantes inválidos.' }
+    }
+
     const { data: group, error: groupError } = await supabase
         .from('groups')
         .insert({
@@ -103,24 +109,21 @@ export async function createSubscriptionGroup(formData: FormData) {
             service_id: service_id || null,
             total_price,
             billing_cycle_day,
-            creator_id: user.id
+            creator_id: user.id,
         })
         .select()
         .single()
 
     if (groupError) return { error: groupError.message }
 
-    // 3. Insert Members (Automatically calculate quota)
     if (members.length > 0) {
-        // Members array already include the creator if they pay their share too.
-        // Actually, the members list from the UI is just who is paying.
-        const quota_amount = total_price / (members.length + 1) // +1 assuming creator always pays a part too
+        const quota_amount = total_price / (members.length + 1)
 
-        const membersToInsert = members.map((m: any) => ({
+        const membersToInsert = members.map((m) => ({
             group_id: group.id,
             user_name: m.name,
             whatsapp_number: m.whatsapp,
-            quota_amount: quota_amount
+            quota_amount,
         }))
 
         await supabase.from('group_members').insert(membersToInsert)

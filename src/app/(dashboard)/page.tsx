@@ -1,10 +1,12 @@
-import { Plus, TrendingUp, CreditCard, Users, ArrowUpRight, Crown } from "lucide-react";
+import { Plus, TrendingUp, CreditCard, Users, Crown } from "lucide-react";
 import Link from "next/link";
 import { getDashboardData } from "./actions";
 import { Card } from "@/components/ui/Card";
+import { formatBillingPeriodLabel } from "@/utils/billing-period";
 
 export default async function Home() {
-  const { profile, groups, pendingAmountFromOthers } = await getDashboardData();
+  const { profile, groups, pendingAmountFromOthers, billingPeriod } = await getDashboardData();
+  const periodLabel = formatBillingPeriodLabel(billingPeriod);
 
   const totalMonthlyCost = groups.reduce((acc: number, group: any) => acc + (Number(group.total_price) || 0), 0);
 
@@ -17,7 +19,9 @@ export default async function Home() {
           <h1 className="text-3xl font-bold tracking-tight mb-2">
             Bienvenido, {profile?.name || profile?.email?.split('@')[0]}
           </h1>
-          <p className="text-zinc-400">Resumen de tus suscripciones compartidas y cobros pendientes.</p>
+          <p className="text-zinc-400">
+            Resumen de cobros · período: <span className="text-zinc-200">{periodLabel}</span>
+          </p>
         </div>
 
         {/* Freemium Limit Warning / Create Button */}
@@ -99,7 +103,7 @@ export default async function Home() {
                   <div>
                     <h3 className="font-bold text-base sm:text-lg group-hover:text-indigo-400 transition-colors">{group.name}</h3>
                     <p className="text-xs sm:text-sm text-zinc-400">
-                      {group.group_members?.length || 0} amigos • Cobra el día {group.billing_cycle_day}
+                      {group.memberCount} amigos · {group.paidCount}/{group.memberCount} pagaron · día {group.billing_cycle_day}
                     </p>
                   </div>
                 </div>

@@ -3,14 +3,26 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
+import { MercadoPagoConfig, Preference } from 'mercadopago'
+import {
+    calculateMercadoPagoGrossAmount,
+    getMercadoPagoFeePercent,
+} from '@/utils/payment-fees'
+import { getCurrentBillingPeriod } from '@/utils/billing-period'
+import { assertGroupOwner } from '@/utils/group-auth'
+import { buildExternalReference } from '@/utils/mercadopago-reference'
+import { getAppUrl } from '@/utils/app-url'
+import { recordMemberPayment } from '@/lib/record-payment'
+import type { GroupMember } from '@/types/database'
+
+type PaymentLinkMember = Pick<GroupMember, 'id' | 'user_name' | 'quota_amount'>
+type PaymentLinkGroup = { id: string; name: string }
 
 export async function getSubscriptionDetails(id: string) {
     const supabase = await createClient()
 
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-        redirect('/login')
-    }
+    if (!user) redirect('/login')
 
     const { data: group } = await supabase
         .from('groups')
@@ -24,80 +36,200 @@ export async function getSubscriptionDetails(id: string) {
         .eq('creator_id', user.id)
         .single()
 
-    if (!group) {
-        redirect('/')
-    }
+    if (!group) redirect('/')
 
-    return group
+    const { data: profile } = await supabase
+        .from('users')
+        .select('payment_alias')
+        .eq('id', user.id)
+        .single()
+
+    return {
+        ...group,
+        payment_alias: profile?.payment_alias ?? null,
+        billingPeriod: getCurrentBillingPeriod(),
+    }
 }
 
-import { MercadoPagoConfig, Preference } from 'mercadopago'
-
-export async function createPaymentLink(member: any, group: any) {
+export async function createPaymentLink(member: PaymentLinkMember, group: PaymentLinkGroup) {
     const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+        return { success: false, link: '', error: 'No autorizado.' }
+    }
+
+    const ownership = await assertGroupOwner(supabase, user.id, group.id)
+    if (!ownership.ok) {
+        return { success: false, link: '', error: ownership.error }
+    }
 
     if (!process.env.MERCADOPAGO_ACCESS_TOKEN || process.env.MERCADOPAGO_ACCESS_TOKEN === 'TU_TOKEN_AQUI') {
-        return { success: false, link: "", error: "Falta configurar el Token de Mercado Pago." }
+        return {
+            success: false,
+            link: '',
+            mpNotConfigured: true,
+            error: 'Mercado Pago no está configurado.',
+        }
     }
 
     try {
+        const billingPeriod = getCurrentBillingPeriod()
         const client = new MercadoPagoConfig({ accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN })
         const preference = new Preference(client)
 
-        const title = `Cuota de ${group.name}`
-        const amount = Number(member.quota_amount)
+        const netAmount = Number(member.quota_amount)
+        const breakdown = calculateMercadoPagoGrossAmount(netAmount, getMercadoPagoFeePercent())
+        const title = `Cuota de ${group.name} (${billingPeriod})`
+        const externalReference = buildExternalReference(group.id, member.id, billingPeriod)
+        const notificationUrl = `${getAppUrl()}/api/webhooks/mercadopago`
+
+        const items =
+            breakdown.feeAmount > 0
+                ? [
+                      {
+                          id: `${member.id}_quota`,
+                          title,
+                          quantity: 1,
+                          unit_price: breakdown.netAmount,
+                          currency_id: 'ARS' as const,
+                      },
+                      {
+                          id: `${member.id}_fee`,
+                          title: 'Comisión Mercado Pago (a cargo del pagador)',
+                          quantity: 1,
+                          unit_price: breakdown.feeAmount,
+                          currency_id: 'ARS' as const,
+                      },
+                  ]
+                : [
+                      {
+                          id: `${member.id}_total`,
+                          title,
+                          quantity: 1,
+                          unit_price: breakdown.grossAmount,
+                          currency_id: 'ARS' as const,
+                      },
+                  ]
 
         const response = await preference.create({
             body: {
-                items: [
-                    {
-                        id: `group_${group.id}_member_${member.id}`,
-                        title: title,
-                        quantity: 1,
-                        unit_price: amount,
-                        currency_id: 'ARS', // Default to ARS, adjust later if needed
-                    }
-                ],
-                payer: {
-                    name: member.user_name,
-                },
-                // Optional: For now, we use external_reference to identify this specific debt
-                external_reference: `group_${group.id}_member_${member.id}`,
-            }
+                items,
+                payer: { name: member.user_name },
+                external_reference: externalReference,
+                notification_url: notificationUrl,
+            },
         })
 
-        return { success: true, link: response.init_point }
-    } catch (e: any) {
-        return { success: false, link: "", error: e.message || "Error al generar Link MP" }
+        return {
+            success: true,
+            link: response.init_point,
+            billingPeriod,
+            ...breakdown,
+        }
+    } catch (e: unknown) {
+        const message = e instanceof Error ? e.message : 'Error al generar Link MP'
+        return { success: false, link: '', error: message }
     }
 }
 
 export async function togglePaymentStatus(memberId: string, groupId: string, amount: number) {
     const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
 
-    // Comprobar si ya existe un registro de "PAID"
+    if (!user) return { success: false, error: 'No autorizado.' }
+
+    const ownership = await assertGroupOwner(supabase, user.id, groupId)
+    if (!ownership.ok) return { success: false, error: ownership.error }
+
+    const billingPeriod = getCurrentBillingPeriod()
+
     const { data: existingPayment } = await supabase
         .from('payments')
-        .select('*')
+        .select('id')
         .eq('member_id', memberId)
         .eq('group_id', groupId)
+        .eq('billing_period', billingPeriod)
         .eq('status', 'PAID')
-        .single()
+        .maybeSingle()
 
     if (existingPayment) {
-        // Desmarcar (borrar el pago histórico para dejarlo pendiente)
         await supabase.from('payments').delete().eq('id', existingPayment.id)
     } else {
-        // Marcar Pagado
-        await supabase.from('payments').insert({
-            member_id: memberId,
-            group_id: groupId,
-            amount: amount,
-            status: 'PAID'
+        await recordMemberPayment(supabase, {
+            groupId,
+            memberId,
+            billingPeriod,
+            amount,
         })
     }
 
     revalidatePath(`/subscriptions/${groupId}`)
+    revalidatePath('/')
+    revalidatePath('/participants')
     return { success: true }
 }
 
+export async function updateSubscriptionGroup(groupId: string, formData: FormData) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) redirect('/login')
+
+    const ownership = await assertGroupOwner(supabase, user.id, groupId)
+    if (!ownership.ok) {
+        redirect(`/subscriptions/${groupId}/edit?error=${encodeURIComponent(ownership.error)}`)
+    }
+
+    const name = (formData.get('name') as string)?.trim()
+    const total_price = parseFloat(formData.get('total_price') as string)
+    const billing_cycle_day = parseInt(formData.get('billing_cycle_day') as string, 10)
+
+    if (!name || !Number.isFinite(total_price) || total_price <= 0) {
+        redirect(`/subscriptions/${groupId}/edit?error=${encodeURIComponent('Nombre y precio válidos son obligatorios.')}`)
+    }
+    if (!Number.isInteger(billing_cycle_day) || billing_cycle_day < 1 || billing_cycle_day > 31) {
+        redirect(`/subscriptions/${groupId}/edit?error=${encodeURIComponent('El día de cobro debe estar entre 1 y 31.')}`)
+    }
+
+    const { error } = await supabase
+        .from('groups')
+        .update({ name, total_price, billing_cycle_day })
+        .eq('id', groupId)
+
+    if (error) {
+        redirect(`/subscriptions/${groupId}/edit?error=${encodeURIComponent(error.message)}`)
+    }
+
+    const { count: memberCount } = await supabase
+        .from('group_members')
+        .select('*', { count: 'exact', head: true })
+        .eq('group_id', groupId)
+
+    if (memberCount && memberCount > 0) {
+        const quota_amount = total_price / (memberCount + 1)
+        await supabase
+            .from('group_members')
+            .update({ quota_amount })
+            .eq('group_id', groupId)
+    }
+
+    revalidatePath(`/subscriptions/${groupId}`)
+    revalidatePath(`/subscriptions/${groupId}/edit`)
+    revalidatePath('/')
+    redirect(`/subscriptions/${groupId}`)
+}
+
+export async function deleteSubscriptionGroup(groupId: string) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { error: 'No autorizado' }
+
+    const ownership = await assertGroupOwner(supabase, user.id, groupId)
+    if (!ownership.ok) return { error: ownership.error }
+
+    const { error } = await supabase.from('groups').delete().eq('id', groupId)
+    if (error) return { error: error.message }
+
+    revalidatePath('/')
+    redirect('/')
+}
