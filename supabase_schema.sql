@@ -8,6 +8,7 @@ create table public.users (
   name text,
   avatar_url text,
   whatsapp_number text,
+  payment_alias text, -- Alias o CBU para transferencias sin comisión
   tier text default 'free', -- 'free' or 'premium'
   mp_subscription_id text,  -- Mercado Pago Subscription ID
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
@@ -96,10 +97,18 @@ create table public.payments (
   member_id uuid references public.group_members on delete cascade not null,
   amount numeric not null,
   status text default 'PENDING', -- 'PENDING', 'PAID'
+  billing_period text not null, -- YYYY-MM, período de cobro mensual
   mercado_pago_link text,
   preference_id text,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
+
+create unique index payments_member_group_period_paid_idx
+  on public.payments (member_id, group_id, billing_period)
+  where status = 'PAID';
+
+create index payments_group_period_idx
+  on public.payments (group_id, billing_period, status);
 
 alter table public.payments enable row level security;
 create policy "Creators can manage payments." on payments 
