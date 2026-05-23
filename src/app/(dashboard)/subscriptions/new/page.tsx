@@ -5,17 +5,22 @@ import { ArrowLeft, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useFormStatus } from "react-dom";
 import { createSubscriptionGroup, getServices } from "../../actions";
+import { Card } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
 
 function SubmitButton() {
     const { pending } = useFormStatus();
     return (
-        <button
+        <Button
             type="submit"
-            disabled={pending}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-xl transition-all shadow-md mt-8 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
+            isLoading={pending}
+            className="w-full mt-8"
+            size="lg"
         >
-            {pending ? "Creando..." : "Crear Grupo"}
-        </button>
+            Crear Grupo
+        </Button>
     );
 }
 
@@ -57,9 +62,9 @@ export default function NewSubscription() {
     };
 
     return (
-        <div className="animate-in fade-in zoom-in-95 duration-500">
-            <Link href="/" className="inline-flex items-center gap-2 text-zinc-400 hover:text-white transition-colors mb-8">
-                <ArrowLeft size={16} />
+        <div className="animate-in fade-in zoom-in-95 duration-500 max-w-5xl mx-auto">
+            <Link href="/" className="inline-flex items-center gap-2 text-zinc-400 hover:text-white transition-colors mb-8 group">
+                <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
                 <span>Volver al Dashboard</span>
             </Link>
 
@@ -69,47 +74,40 @@ export default function NewSubscription() {
             </header>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2 space-y-8">
-                    <form action={handleSubmit} className="p-8 rounded-2xl border border-white/5 bg-white/5 backdrop-blur-xl shadow-2xl">
+                <div className="lg:col-span-2 space-y-8 order-2 lg:order-1">
+                    <Card className="p-4 sm:p-8" variant="glass">
+                        <form action={handleSubmit}>
+                            {error && (
+                                <div className="mb-6 bg-red-500/10 border border-red-500/20 text-red-500 p-4 rounded-xl text-sm font-medium">
+                                    {error}
+                                </div>
+                            )}
 
-                        {error && (
-                            <div className="mb-6 bg-red-500/10 border border-red-500/20 text-red-500 p-4 rounded-xl text-sm font-medium">
-                                {error}
-                            </div>
-                        )}
-
-                        <div className="space-y-6">
-                            {/* Service Details */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-zinc-300">Servicio</label>
-                                    <select
+                            <div className="space-y-8">
+                                {/* Service Details */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <Select
+                                        label="Servicio"
                                         name="service_id"
-                                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-zinc-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 appearance-none"
                                         required
                                     >
                                         <option value="">Selecciona un servicio</option>
                                         {services.map(s => (
                                             <option key={s.id} value={s.id}>{s.name}</option>
                                         ))}
-                                    </select>
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-zinc-300">Nombre Opcional</label>
-                                    <input
+                                    </Select>
+                                    <Input
+                                        label="Nombre Opcional"
                                         type="text"
                                         name="name"
                                         placeholder="Ej: Netflix de la Familia"
                                         required
-                                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
                                     />
                                 </div>
-                            </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-zinc-300">Costo Total Mensual ($)</label>
-                                    <input
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <Input
+                                        label="Costo Total Mensual ($)"
                                         type="number"
                                         step="0.01"
                                         name="total_price"
@@ -117,109 +115,100 @@ export default function NewSubscription() {
                                         value={totalPrice}
                                         onChange={(e) => setTotalPrice(e.target.value)}
                                         placeholder="0.00"
-                                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
                                     />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-zinc-300">Día de Cobro (1-31)</label>
-                                    <input
+                                    <Input
+                                        label="Día de Cobro (1-31)"
                                         type="number"
                                         name="billing_cycle_day"
                                         min="1"
                                         max="31"
                                         required
                                         placeholder="Día del mes"
-                                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
                                     />
                                 </div>
-                            </div>
 
-                            <hr className="border-white/5 my-8" />
+                                <hr className="border-white/5" />
 
-                            {/* Participants */}
-                            <div>
-                                <div className="flex items-center justify-between mb-4">
-                                    <h3 className="text-lg font-medium">Amigos (Participantes)</h3>
-                                </div>
-
-                                <div className="space-y-4">
-                                    {members.map((member, index) => (
-                                        <div key={member.id} className="flex gap-4 items-start">
-                                            <div className="flex-1 space-y-2">
-                                                <input
-                                                    type="text"
+                                {/* Participants */}
+                                <div>
+                                    <h3 className="text-lg font-medium mb-4">Amigos (Participantes)</h3>
+                                    <div className="space-y-4">
+                                        {members.map((member) => (
+                                            <div key={member.id} className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-start p-4 sm:p-0 rounded-xl bg-white/5 sm:bg-transparent border border-white/5 sm:border-none">
+                                                <Input
+                                                    placeholder="Nombre del amigo"
                                                     value={member.name}
                                                     onChange={(e) => updateMember(member.id, 'name', e.target.value)}
-                                                    placeholder="Nombre del amigo"
-                                                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm"
+                                                    className="text-sm"
                                                 />
-                                            </div>
-                                            <div className="flex-1 space-y-2">
-                                                <input
+                                                <Input
+                                                    placeholder="WhatsApp (Ej: 54911...)"
                                                     type="tel"
                                                     value={member.whatsapp}
                                                     onChange={(e) => updateMember(member.id, 'whatsapp', e.target.value)}
-                                                    placeholder="WhatsApp (Ej: 54911...)"
-                                                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm"
+                                                    className="text-sm"
                                                 />
+                                                {members.length > 1 && (
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        onClick={() => removeMember(member.id)}
+                                                        className="self-end sm:self-auto sm:mt-1"
+                                                        title="Quitar"
+                                                    >
+                                                        <Trash2 size={20} />
+                                                    </Button>
+                                                )}
                                             </div>
-                                            {members.length > 1 && (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => removeMember(member.id)}
-                                                    className="p-3 text-zinc-500 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-colors mt-0.5"
-                                                    title="Quitar"
-                                                >
-                                                    <Trash2 size={20} />
-                                                </button>
-                                            )}
-                                        </div>
-                                    ))}
+                                        ))}
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        onClick={addMember}
+                                        className="mt-4 flex items-center gap-2 text-sm text-indigo-400 hover:text-indigo-300 font-medium transition-colors"
+                                    >
+                                        <Plus size={16} /> Añadir otro amigo
+                                    </button>
                                 </div>
-
-                                <button
-                                    type="button"
-                                    onClick={addMember}
-                                    className="mt-4 flex items-center gap-2 text-sm text-indigo-400 hover:text-indigo-300 font-medium"
-                                >
-                                    <Plus size={16} /> Añadir otro amigo
-                                </button>
                             </div>
-                        </div>
 
-                        <SubmitButton />
-                    </form>
+                            <SubmitButton />
+                        </form>
+                    </Card>
                 </div>
 
                 {/* Summary Sidebar */}
-                <div className="lg:col-span-1">
-                    <div className="p-6 rounded-2xl border border-white/5 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 sticky top-10 shadow-xl">
+                <div className="lg:col-span-1 order-1 lg:order-2">
+                    <Card className="p-6 lg:sticky lg:top-10" variant="gradient">
                         <h3 className="font-bold text-lg mb-6">Resumen del Grupo</h3>
 
                         <div className="space-y-4">
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-zinc-400">Total Mensual</span>
-                                <span className="font-medium">${totalPrice || "0.00"}</span>
+                                <span className="font-medium text-white">${totalPrice || "0.00"}</span>
                             </div>
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-zinc-400">Total de Personas</span>
-                                <span className="font-medium">{numberOfPeople} <span className="text-xs text-zinc-500">(Incluyéndote)</span></span>
+                                <span className="font-medium text-white">
+                                    {numberOfPeople} <span className="text-xs text-zinc-500 font-normal">(Incluyéndote)</span>
+                                </span>
                             </div>
 
                             <hr className="border-white/10 my-4" />
 
                             <div className="flex justify-between items-center">
-                                <span className="font-medium">Cuota por Persona</span>
+                                <span className="font-medium text-white">Cuota por Persona</span>
                                 <span className="font-bold text-2xl text-indigo-400">
                                     ${quotaPerPerson.toFixed(2)}
                                 </span>
                             </div>
 
-                            <div className="mt-6 p-4 bg-black/20 rounded-xl text-xs text-zinc-400 border border-white/5">
+                            <div className="mt-6 p-4 bg-black/20 rounded-xl text-xs text-zinc-400 border border-white/5 leading-relaxed">
                                 La cuota se divide en partes iguales entre todos los amigos listados y tú como creador automáticamente.
                             </div>
                         </div>
-                    </div>
+                    </Card>
                 </div>
             </div>
         </div>
