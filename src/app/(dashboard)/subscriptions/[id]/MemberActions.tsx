@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { MessageCircle, CreditCard, Link as LinkIcon, Check } from 'lucide-react'
+import { MessageCircle, Link as LinkIcon, Check } from 'lucide-react'
 import { createPaymentLink, togglePaymentStatus } from './actions'
+import { Button } from '@/components/ui/Button'
 
 export function MemberActions({ member, group, isPaid }: { member: any, group: any, isPaid: boolean }) {
     const [loading, setLoading] = useState(false)
@@ -49,34 +50,35 @@ export function MemberActions({ member, group, isPaid }: { member: any, group: a
         <div className="flex gap-2 justify-end items-center">
             {!isPaid && (
                 <>
-                    <button
+                    <Button
                         onClick={handleWhatsApp}
                         title="Cobrar por WhatsApp"
                         disabled={loading || isPending}
-                        className="p-2 text-green-500 hover:bg-green-500/10 rounded-lg transition-colors disabled:opacity-50"
+                        variant="ghost"
+                        className="text-green-500 hover:text-green-400"
                     >
                         <MessageCircle size={18} />
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         onClick={copyLink}
                         title="Copiar link de pago"
                         disabled={loading || isPending}
-                        className="p-2 text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-colors disabled:opacity-50"
+                        variant="ghost"
+                        className="text-indigo-400 hover:text-indigo-300"
                     >
                         {linkCopied ? <Check size={18} className="text-green-400" /> : <LinkIcon size={18} />}
-                    </button>
+                    </Button>
                 </>
             )}
-            <button
+            <Button
                 onClick={handleTogglePayment}
-                disabled={isPending}
-                className={`px-3 py-1.5 border rounded-lg text-xs font-medium transition-colors ml-2 disabled:opacity-50
-                    ${isPaid
-                        ? 'bg-green-500/10 text-green-400 border-green-500/20 hover:bg-green-500/20'
-                        : 'bg-white/5 border-white/10 hover:bg-white/10 text-white'}`}
+                isLoading={isPending}
+                variant={isPaid ? "secondary" : "secondary"}
+                size="sm"
+                className={`ml-2 ${isPaid ? 'text-green-400 border-green-500/20 bg-green-500/5' : 'text-white'}`}
             >
-                {isPending ? 'Guardando...' : isPaid ? "✓ Pagado" : "Marcar Pagado"}
-            </button>
+                {isPaid ? "✓ Pagado" : "Marcar Pagado"}
+            </Button>
         </div>
     )
 }
