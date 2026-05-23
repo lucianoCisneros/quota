@@ -1,36 +1,84 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Quota
 
-## Getting Started
+App para dividir suscripciones compartidas (Netflix, Spotify, etc.) y cobrar cuotas a tus amigos por **WhatsApp**, con **transferencia** (alias/CBU) y **Mercado Pago**.
 
-First, run the development server:
+## Stack
+
+- [Next.js](https://nextjs.org) 16 (App Router)
+- [Supabase](https://supabase.com) (Auth + PostgreSQL)
+- [Mercado Pago](https://www.mercadopago.com.ar/developers) (links de pago)
+
+## Configuración local
+
+1. Cloná el repo e instalá dependencias:
+
+```bash
+npm install
+```
+
+2. Copiá variables de entorno:
+
+```bash
+cp .env.example .env.local
+```
+
+3. Completá en `.env.local`:
+
+| Variable | Descripción |
+|----------|-------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | URL del proyecto Supabase |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Anon key |
+| `SUPABASE_SERVICE_ROLE_KEY` | Service role (necesaria para el webhook de MP) |
+| `MERCADOPAGO_ACCESS_TOKEN` | Access Token de tu app MP |
+| `NEXT_PUBLIC_APP_URL` | `http://localhost:3000` en desarrollo |
+
+4. En Supabase → SQL Editor, ejecutá en orden:
+
+- `supabase_schema.sql` (esquema base)
+- `supabase/migrations/20250523_payment_alias.sql`
+- `supabase/migrations/20250523_billing_period.sql`
+
+5. En **Ajustes** de la app configurá tu alias para transferencias.
+
+6. Arrancá el servidor:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Mercado Pago — Webhook
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Para marcar pagos automáticamente cuando un amigo paga por link:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. En [Mercado Pago Developers](https://www.mercadopago.com.ar/developers/panel/app) → tu app → **Webhooks**.
+2. URL de notificación: `https://TU_DOMINIO/api/webhooks/mercadopago`
+3. Eventos: **Pagos**.
+4. En local usá [ngrok](https://ngrok.com) o similar y poné esa URL en `NEXT_PUBLIC_APP_URL`.
 
-## Learn More
+## Ciclo mensual de cobros
 
-To learn more about Next.js, take a look at the following resources:
+Cada pago queda asociado a un período `YYYY-MM` (mes calendario, zona Argentina). Al cambiar de mes, los participantes vuelven a **pendiente** hasta que paguen o los marques como pagados.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Scripts
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run dev    # desarrollo
+npm run build  # producción
+npm run lint   # ESLint
+```
 
-## Deploy on Vercel
+## Estructura principal
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+src/
+  app/(dashboard)/     # rutas autenticadas
+  app/api/webhooks/    # webhook Mercado Pago
+  lib/record-payment.ts
+  types/database.ts
+  utils/               # billing, fees, auth de grupos
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Plan gratuito vs Premium
+
+- **Free:** 1 grupo.
+- **Premium:** grupos ilimitados (página `/premium`, integración de pago pendiente).
