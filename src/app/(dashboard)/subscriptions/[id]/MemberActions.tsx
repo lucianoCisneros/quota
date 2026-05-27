@@ -10,7 +10,13 @@ import { formatArs, calculateMercadoPagoGrossAmount } from '@/utils/payment-fees
 import { MemberEditDialog } from './MemberEditDialog'
 
 type MemberActionsProps = {
-    member: { id: string; user_name: string; whatsapp_number?: string | null; email?: string | null; quota_amount: number }
+    member: {
+        id: string
+        user_name: string
+        whatsapp_number?: string | null
+        email?: string | null
+        quota_amount: number
+    }
     group: { id: string; name: string }
     isPaid: boolean
     paymentAlias: string | null
@@ -29,17 +35,8 @@ function buildPaymentMessage(params: {
     paymentAlias: string
     mpLink?: string | null
 }): string {
-    const {
-        memberName,
-        groupName,
-        periodLabel,
-        netAmount,
-        grossAmount,
-        feeAmount,
-        feePercent,
-        paymentAlias,
-        mpLink,
-    } = params
+    const { memberName, groupName, periodLabel, netAmount, grossAmount, feeAmount, feePercent, paymentAlias, mpLink } =
+        params
 
     const transferSection =
         `1) TRANSFERENCIA (sin comisión)\n` +
@@ -76,7 +73,7 @@ function buildMessageParams(
     paymentAlias: string,
     mpFeePercent: number,
     periodLabel: string,
-    response: Awaited<ReturnType<typeof createPaymentLink>> | null
+    response: Awaited<ReturnType<typeof createPaymentLink>> | null,
 ) {
     const netAmount = Number(member.quota_amount)
     const breakdown = calculateMercadoPagoGrossAmount(netAmount, mpFeePercent)
@@ -94,14 +91,7 @@ function buildMessageParams(
     }
 }
 
-export function MemberActions({
-    member,
-    group,
-    isPaid,
-    paymentAlias,
-    mpFeePercent,
-    periodLabel,
-}: MemberActionsProps) {
+export function MemberActions({ member, group, isPaid, paymentAlias, mpFeePercent, periodLabel }: MemberActionsProps) {
     const [loading, setLoading] = useState(false)
     const [emailLoading, setEmailLoading] = useState(false)
     const [emailSent, setEmailSent] = useState(false)
@@ -135,7 +125,7 @@ export function MemberActions({
 
         const response = await handleGeneratePaymentLink()
         const message = buildPaymentMessage(
-            buildMessageParams(member, group, paymentAlias, mpFeePercent, periodLabel, response)
+            buildMessageParams(member, group, paymentAlias, mpFeePercent, periodLabel, response),
         )
 
         openWhatsApp(message)
@@ -149,7 +139,7 @@ export function MemberActions({
 
         const response = await handleGeneratePaymentLink()
         const message = buildPaymentMessage(
-            buildMessageParams(member, group, paymentAlias, mpFeePercent, periodLabel, response)
+            buildMessageParams(member, group, paymentAlias, mpFeePercent, periodLabel, response),
         )
 
         navigator.clipboard.writeText(message)
@@ -228,11 +218,7 @@ export function MemberActions({
                                     variant="ghost"
                                     className="text-blue-400 hover:text-blue-300 disabled:opacity-40"
                                 >
-                                    {emailSent ? (
-                                        <Check size={18} className="text-green-400" />
-                                    ) : (
-                                        <Mail size={18} />
-                                    )}
+                                    {emailSent ? <Check size={18} className="text-green-400" /> : <Mail size={18} />}
                                 </Button>
                             )}
                             <Button
@@ -242,11 +228,7 @@ export function MemberActions({
                                 variant="ghost"
                                 className="text-indigo-400 hover:text-indigo-300 disabled:opacity-40"
                             >
-                                {linkCopied ? (
-                                    <Check size={18} className="text-green-400" />
-                                ) : (
-                                    <LinkIcon size={18} />
-                                )}
+                                {linkCopied ? <Check size={18} className="text-green-400" /> : <LinkIcon size={18} />}
                             </Button>
                         </>
                     )}
@@ -262,13 +244,7 @@ export function MemberActions({
                 </div>
             </div>
 
-            {showEdit && (
-                <MemberEditDialog
-                    member={member}
-                    groupId={group.id}
-                    onClose={() => setShowEdit(false)}
-                />
-            )}
+            {showEdit && <MemberEditDialog member={member} groupId={group.id} onClose={() => setShowEdit(false)} />}
         </>
     )
 }

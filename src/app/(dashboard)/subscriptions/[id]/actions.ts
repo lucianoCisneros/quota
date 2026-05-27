@@ -4,10 +4,7 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { MercadoPagoConfig, Preference } from 'mercadopago'
-import {
-    calculateMercadoPagoGrossAmount,
-    getMercadoPagoFeePercent,
-} from '@/utils/payment-fees'
+import { calculateMercadoPagoGrossAmount, getMercadoPagoFeePercent } from '@/utils/payment-fees'
 import { getCurrentBillingPeriod } from '@/utils/billing-period'
 import { assertGroupOwner } from '@/utils/group-auth'
 import { buildExternalReference } from '@/utils/mercadopago-reference'
@@ -21,28 +18,28 @@ type PaymentLinkGroup = { id: string; name: string }
 export async function getSubscriptionDetails(id: string) {
     const supabase = await createClient()
 
-    const { data: { user } } = await supabase.auth.getUser()
+    const {
+        data: { user },
+    } = await supabase.auth.getUser()
     if (!user) redirect('/login')
 
     const { data: group } = await supabase
         .from('groups')
-        .select(`
+        .select(
+            `
             *,
             services (*),
             group_members (*),
             payments (*)
-        `)
+        `,
+        )
         .eq('id', id)
         .eq('creator_id', user.id)
         .single()
 
     if (!group) redirect('/')
 
-    const { data: profile } = await supabase
-        .from('users')
-        .select('payment_alias')
-        .eq('id', user.id)
-        .single()
+    const { data: profile } = await supabase.from('users').select('payment_alias').eq('id', user.id).single()
 
     return {
         ...group,
@@ -53,7 +50,9 @@ export async function getSubscriptionDetails(id: string) {
 
 export async function createPaymentLink(member: PaymentLinkMember, group: PaymentLinkGroup) {
     const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const {
+        data: { user },
+    } = await supabase.auth.getUser()
 
     if (!user) {
         return { success: false, link: '', error: 'No autorizado.' }
@@ -135,7 +134,9 @@ export async function createPaymentLink(member: PaymentLinkMember, group: Paymen
 
 export async function togglePaymentStatus(memberId: string, groupId: string, amount: number) {
     const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const {
+        data: { user },
+    } = await supabase.auth.getUser()
 
     if (!user) return { success: false, error: 'No autorizado.' }
 
@@ -172,7 +173,9 @@ export async function togglePaymentStatus(memberId: string, groupId: string, amo
 
 export async function updateSubscriptionGroup(groupId: string, formData: FormData) {
     const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const {
+        data: { user },
+    } = await supabase.auth.getUser()
     if (!user) redirect('/login')
 
     const ownership = await assertGroupOwner(supabase, user.id, groupId)
@@ -185,16 +188,17 @@ export async function updateSubscriptionGroup(groupId: string, formData: FormDat
     const billing_cycle_day = parseInt(formData.get('billing_cycle_day') as string, 10)
 
     if (!name || !Number.isFinite(total_price) || total_price <= 0) {
-        redirect(`/subscriptions/${groupId}/edit?error=${encodeURIComponent('Nombre y precio válidos son obligatorios.')}`)
+        redirect(
+            `/subscriptions/${groupId}/edit?error=${encodeURIComponent('Nombre y precio válidos son obligatorios.')}`,
+        )
     }
     if (!Number.isInteger(billing_cycle_day) || billing_cycle_day < 1 || billing_cycle_day > 31) {
-        redirect(`/subscriptions/${groupId}/edit?error=${encodeURIComponent('El día de cobro debe estar entre 1 y 31.')}`)
+        redirect(
+            `/subscriptions/${groupId}/edit?error=${encodeURIComponent('El día de cobro debe estar entre 1 y 31.')}`,
+        )
     }
 
-    const { error } = await supabase
-        .from('groups')
-        .update({ name, total_price, billing_cycle_day })
-        .eq('id', groupId)
+    const { error } = await supabase.from('groups').update({ name, total_price, billing_cycle_day }).eq('id', groupId)
 
     if (error) {
         redirect(`/subscriptions/${groupId}/edit?error=${encodeURIComponent(error.message)}`)
@@ -207,10 +211,7 @@ export async function updateSubscriptionGroup(groupId: string, formData: FormDat
 
     if (memberCount && memberCount > 0) {
         const quota_amount = total_price / (memberCount + 1)
-        await supabase
-            .from('group_members')
-            .update({ quota_amount })
-            .eq('group_id', groupId)
+        await supabase.from('group_members').update({ quota_amount }).eq('group_id', groupId)
     }
 
     revalidatePath(`/subscriptions/${groupId}`)
@@ -219,13 +220,11 @@ export async function updateSubscriptionGroup(groupId: string, formData: FormDat
     redirect(`/subscriptions/${groupId}`)
 }
 
-export async function updateMember(
-    memberId: string,
-    groupId: string,
-    formData: FormData
-) {
+export async function updateMember(memberId: string, groupId: string, formData: FormData) {
     const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const {
+        data: { user },
+    } = await supabase.auth.getUser()
     if (!user) return { success: false, error: 'No autorizado.' }
 
     const ownership = await assertGroupOwner(supabase, user.id, groupId)
@@ -257,7 +256,9 @@ export async function updateMember(
 
 export async function deleteSubscriptionGroup(groupId: string) {
     const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const {
+        data: { user },
+    } = await supabase.auth.getUser()
     if (!user) return { error: 'No autorizado' }
 
     const ownership = await assertGroupOwner(supabase, user.id, groupId)
