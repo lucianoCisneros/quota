@@ -15,21 +15,25 @@ export type SubscriptionRow = {
 
 export async function getAllSubscriptions() {
     const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const {
+        data: { user },
+    } = await supabase.auth.getUser()
     if (!user) redirect('/login')
 
     const billingPeriod = getCurrentBillingPeriod()
 
     const { data: groups } = await supabase
         .from('groups')
-        .select(`
+        .select(
+            `
             id,
             name,
             billing_cycle_day,
             total_price,
             group_members (*),
             payments (*)
-        `)
+        `,
+        )
         .eq('creator_id', user.id)
         .order('name')
 
@@ -38,7 +42,7 @@ export async function getAllSubscriptions() {
     for (const group of groups ?? []) {
         // Determine if the whole group is paid for the period (any unpaid member makes it pending)
         const isGroupPaid = (group.group_members ?? []).every((member: GroupMember) =>
-            isPaidForPeriod(group.payments as Payment[], member.id, billingPeriod)
+            isPaidForPeriod(group.payments as Payment[], member.id, billingPeriod),
         )
         const totalAmount = Number(group.total_price ?? 0)
         subscriptions.push({

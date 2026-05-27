@@ -13,20 +13,24 @@ export type ParticipantRow = GroupMember & {
 
 export async function getAllParticipants() {
     const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const {
+        data: { user },
+    } = await supabase.auth.getUser()
     if (!user) redirect('/login')
 
     const billingPeriod = getCurrentBillingPeriod()
 
     const { data: groups } = await supabase
         .from('groups')
-        .select(`
+        .select(
+            `
             id,
             name,
             billing_cycle_day,
             group_members (*),
             payments (*)
-        `)
+        `,
+        )
         .eq('creator_id', user.id)
         .order('name')
 

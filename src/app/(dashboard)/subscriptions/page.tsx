@@ -3,7 +3,6 @@ import { getAllSubscriptions } from './actions'
 import { formatBillingPeriodLabel } from '@/utils/billing-period'
 import { Card } from '@/components/ui/Card'
 
-
 export default async function SubscriptionsPage() {
     const { subscriptions, billingPeriod } = await getAllSubscriptions()
     const periodLabel = formatBillingPeriodLabel(billingPeriod)

@@ -36,10 +36,7 @@ export function MemberEditDialog({ member, groupId, onClose }: MemberEditDialogP
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             {/* Backdrop */}
-            <div
-                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-                onClick={onClose}
-            />
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
             {/* Modal */}
             <div className="relative w-full max-w-md rounded-2xl bg-zinc-900 border border-white/10 shadow-2xl p-6 sm:p-8 animate-in fade-in zoom-in-95 duration-200">
@@ -86,11 +83,7 @@ export function MemberEditDialog({ member, groupId, onClose }: MemberEditDialogP
                     />
 
                     <div className="flex gap-3 pt-2">
-                        <Button
-                            type="submit"
-                            isLoading={isPending}
-                            className="flex-1"
-                        >
+                        <Button type="submit" isLoading={isPending} className="flex-1">
                             Guardar cambios
                         </Button>
                         <Button

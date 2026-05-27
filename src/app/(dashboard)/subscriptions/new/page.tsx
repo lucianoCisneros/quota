@@ -1,69 +1,65 @@
-'use client';
+'use client'
 
-import { useState, useEffect } from "react";
-import { ArrowLeft, Plus, Trash2 } from "lucide-react";
-import Link from "next/link";
-import { useFormStatus } from "react-dom";
-import { createSubscriptionGroup, getServices } from "../../actions";
-import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { Select } from "@/components/ui/Select";
+import { useState, useEffect } from 'react'
+import { ArrowLeft, Plus, Trash2 } from 'lucide-react'
+import Link from 'next/link'
+import { useFormStatus } from 'react-dom'
+import type { Service } from '@/types/database'
+import { createSubscriptionGroup, getServices } from '../../actions'
+import { Card, Button, Input, Select } from '@/components/ui'
 
 function SubmitButton() {
-    const { pending } = useFormStatus();
+    const { pending } = useFormStatus()
     return (
-        <Button
-            type="submit"
-            isLoading={pending}
-            className="w-full mt-8"
-            size="lg"
-        >
+        <Button type="submit" isLoading={pending} className="w-full mt-8" size="lg">
             Crear Grupo
         </Button>
-    );
+    )
 }
 
 export default function NewSubscription() {
-    const [services, setServices] = useState<any[]>([]);
-    const [members, setMembers] = useState([{ id: 1, name: "", whatsapp: "", email: "" }]);
-    const [totalPrice, setTotalPrice] = useState<string>("");
-    const [error, setError] = useState<string>("");
+    const [services, setServices] = useState<Service[]>([])
+    const [members, setMembers] = useState([{ id: 1, name: '', whatsapp: '', email: '' }])
+    const [totalPrice, setTotalPrice] = useState<string>('')
+    const [error, setError] = useState<string>('')
 
     useEffect(() => {
-        getServices().then(setServices);
-    }, []);
+        getServices().then(setServices)
+    }, [])
 
     const addMember = () => {
-        setMembers([...members, { id: Date.now(), name: "", whatsapp: "", email: "" }]);
-    };
+        setMembers([...members, { id: Date.now(), name: '', whatsapp: '', email: '' }])
+    }
 
     const removeMember = (id: number) => {
-        setMembers(members.filter((m) => m.id !== id));
-    };
+        setMembers(members.filter((m) => m.id !== id))
+    }
 
     const updateMember = (id: number, field: string, value: string) => {
-        setMembers(members.map(m => m.id === id ? { ...m, [field]: value } : m));
-    };
+        setMembers(members.map((m) => (m.id === id ? { ...m, [field]: value } : m)))
+    }
 
     // Calculate dynamic quota including the creator
-    const numberOfPeople = members.filter(m => m.name.trim() !== "").length + 1;
-    const quotaPerPerson = parseFloat(totalPrice || "0") / numberOfPeople;
+    const numberOfPeople = members.filter((m) => m.name.trim() !== '').length + 1
+    const quotaPerPerson = parseFloat(totalPrice || '0') / numberOfPeople
 
     const handleSubmit = async (formData: FormData) => {
-        setError("");
-        const validMembers = members.filter(m => m.name.trim() !== "" && m.whatsapp.trim() !== "");
-        formData.append("membersData", JSON.stringify(validMembers));
+        setError('')
+        const validMembers = members.filter((m) => m.name.trim() !== '' && m.whatsapp.trim() !== '')
+        formData.append('membersData', JSON.stringify(validMembers))
 
-        const result = await createSubscriptionGroup(formData);
+        const result = await createSubscriptionGroup(formData)
         if (result?.error) {
-            setError(result.error);
+            setError(result.error)
         }
-    };
+    }
 
     return (
         <div className="animate-in fade-in zoom-in-95 duration-500 max-w-5xl mx-auto">
-            <Link href="/" className="inline-flex items-center gap-2 text-zinc-400 hover:text-white transition-colors mb-8 group">
+            <Link
+                href="/"
+                className="inline-flex items-center gap-2 text-zinc-400 hover:text-white transition-colors mb-8 group"
+            >
                 <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
                 <span>Volver al Dashboard</span>
             </Link>
@@ -86,14 +82,12 @@ export default function NewSubscription() {
                             <div className="space-y-8">
                                 {/* Service Details */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <Select
-                                        label="Servicio"
-                                        name="service_id"
-                                        required
-                                    >
+                                    <Select label="Servicio" name="service_id" required>
                                         <option value="">Selecciona un servicio</option>
-                                        {services.map(s => (
-                                            <option key={s.id} value={s.id}>{s.name}</option>
+                                        {services.map((s) => (
+                                            <option key={s.id} value={s.id}>
+                                                {s.name}
+                                            </option>
                                         ))}
                                     </Select>
                                     <Input
@@ -134,7 +128,10 @@ export default function NewSubscription() {
                                     <h3 className="text-lg font-medium mb-4">Integrantes</h3>
                                     <div className="space-y-4">
                                         {members.map((member) => (
-                                            <div key={member.id} className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-start p-4 sm:p-0 rounded-xl bg-white/5 sm:bg-transparent border border-white/5 sm:border-none">
+                                            <div
+                                                key={member.id}
+                                                className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-start p-4 sm:p-0 rounded-xl bg-white/5 sm:bg-transparent border border-white/5 sm:border-none"
+                                            >
                                                 <Input
                                                     placeholder="Nombre del amigo"
                                                     value={member.name}
@@ -145,7 +142,9 @@ export default function NewSubscription() {
                                                     placeholder="WhatsApp (Ej: 54911...)"
                                                     type="tel"
                                                     value={member.whatsapp}
-                                                    onChange={(e) => updateMember(member.id, 'whatsapp', e.target.value)}
+                                                    onChange={(e) =>
+                                                        updateMember(member.id, 'whatsapp', e.target.value)
+                                                    }
                                                     className="text-sm"
                                                 />
                                                 <Input
@@ -193,12 +192,13 @@ export default function NewSubscription() {
                         <div className="space-y-4">
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-zinc-400">Total Mensual</span>
-                                <span className="font-medium text-white">${totalPrice || "0.00"}</span>
+                                <span className="font-medium text-white">${totalPrice || '0.00'}</span>
                             </div>
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-zinc-400">Total de Personas</span>
                                 <span className="font-medium text-white">
-                                    {numberOfPeople} <span className="text-xs text-zinc-500 font-normal">(Incluyéndote)</span>
+                                    {numberOfPeople}{' '}
+                                    <span className="text-xs text-zinc-500 font-normal">(Incluyéndote)</span>
                                 </span>
                             </div>
 
@@ -206,18 +206,17 @@ export default function NewSubscription() {
 
                             <div className="flex justify-between items-center">
                                 <span className="font-medium text-white">Cuota por Persona</span>
-                                <span className="font-bold text-2xl text-indigo-400">
-                                    ${quotaPerPerson.toFixed(2)}
-                                </span>
+                                <span className="font-bold text-2xl text-indigo-400">${quotaPerPerson.toFixed(2)}</span>
                             </div>
 
                             <div className="mt-6 p-4 bg-black/20 rounded-xl text-xs text-zinc-400 border border-white/5 leading-relaxed">
-                                La cuota se divide en partes iguales entre todos los amigos listados y tú como creador automáticamente.
+                                La cuota se divide en partes iguales entre todos los amigos listados y tú como creador
+                                automáticamente.
                             </div>
                         </div>
                     </Card>
                 </div>
             </div>
         </div>
-    );
+    )
 }

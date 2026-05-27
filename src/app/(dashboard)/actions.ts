@@ -9,25 +9,25 @@ import type { GroupMember, Payment } from '@/types/database'
 export async function getDashboardData() {
     const supabase = await createClient()
 
-    const { data: { user } } = await supabase.auth.getUser()
+    const {
+        data: { user },
+    } = await supabase.auth.getUser()
     if (!user) redirect('/login')
 
     const billingPeriod = getCurrentBillingPeriod()
 
-    const { data: profile } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', user.id)
-        .single()
+    const { data: profile } = await supabase.from('users').select('*').eq('id', user.id).single()
 
     const { data: groups } = await supabase
         .from('groups')
-        .select(`
+        .select(
+            `
             *,
             services (*),
             group_members (*),
             payments (*)
-        `)
+        `,
+        )
         .eq('creator_id', user.id)
         .order('created_at', { ascending: false })
 
@@ -35,16 +35,9 @@ export async function getDashboardData() {
     const groupsWithStats = (groups ?? []).map((group) => {
         const members = (group.group_members ?? []) as GroupMember[]
         const payments = (group.payments ?? []) as Payment[]
-        const paidCount = members.filter((m) =>
-            isPaidForPeriod(payments, m.id, billingPeriod)
-        ).length
-        const pendingMembers = members.filter(
-            (m) => !isPaidForPeriod(payments, m.id, billingPeriod)
-        )
-        const pendingForGroup = pendingMembers.reduce(
-            (sum, m) => sum + Number(m.quota_amount),
-            0
-        )
+        const paidCount = members.filter((m) => isPaidForPeriod(payments, m.id, billingPeriod)).length
+        const pendingMembers = members.filter((m) => !isPaidForPeriod(payments, m.id, billingPeriod))
+        const pendingForGroup = pendingMembers.reduce((sum, m) => sum + Number(m.quota_amount), 0)
         totalPendingAmount += pendingForGroup
 
         return {
@@ -71,7 +64,9 @@ export async function getServices() {
 
 export async function createSubscriptionGroup(formData: FormData) {
     const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const {
+        data: { user },
+    } = await supabase.auth.getUser()
 
     if (!user) return { error: 'No autorizado' }
 

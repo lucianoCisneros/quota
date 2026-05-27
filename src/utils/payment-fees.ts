@@ -14,9 +14,7 @@ export function isMercadoPagoConfigured(): boolean {
 }
 
 export function getMercadoPagoFeePercent(): number {
-    const raw =
-        process.env.MERCADOPAGO_FEE_PERCENT ??
-        process.env.NEXT_PUBLIC_MERCADOPAGO_FEE_PERCENT
+    const raw = process.env.MERCADOPAGO_FEE_PERCENT ?? process.env.NEXT_PUBLIC_MERCADOPAGO_FEE_PERCENT
 
     if (!raw) return DEFAULT_MP_FEE_PERCENT
 
@@ -30,7 +28,7 @@ export function getMercadoPagoFeePercent(): number {
 /** Monto a cobrar al pagador para que vos recibas `netAmount` después de la comisión % */
 export function calculateMercadoPagoGrossAmount(
     netAmount: number,
-    feePercent: number = DEFAULT_MP_FEE_PERCENT
+    feePercent: number = DEFAULT_MP_FEE_PERCENT,
 ): MercadoPagoAmountBreakdown {
     const rate = feePercent / 100
     const grossAmount = Math.ceil((netAmount / (1 - rate)) * 100) / 100

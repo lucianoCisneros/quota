@@ -3,7 +3,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 export async function assertGroupOwner(
     supabase: SupabaseClient,
     userId: string,
-    groupId: string
+    groupId: string,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
     const { data: group, error } = await supabase
         .from('groups')

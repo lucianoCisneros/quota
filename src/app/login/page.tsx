@@ -1,11 +1,7 @@
 import { login, signup } from './actions'
 import { Activity } from 'lucide-react'
 
-export default async function LoginPage({
-    searchParams,
-}: {
-    searchParams: Promise<{ message: string }>
-}) {
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ message: string }> }) {
     const { message } = await searchParams
 
     return (
@@ -17,9 +13,7 @@ export default async function LoginPage({
                         <Activity className="h-6 w-6 text-indigo-400" />
                     </div>
                     <h1 className="text-3xl font-semibold tracking-tight">Bienvenido a Quota</h1>
-                    <p className="text-sm text-zinc-400">
-                        Ingresa tus datos para gestionar tus suscripciones grupales
-                    </p>
+                    <p className="text-sm text-zinc-400">Ingresa tus datos para gestionar tus suscripciones grupales</p>
                 </div>
 
                 {/* Form Container (Glassmorphism) */}

@@ -1,19 +1,15 @@
-import { getSubscriptionDetails } from "./actions"
-import { notFound } from "next/navigation"
-import { ArrowLeft } from "lucide-react"
-import Link from "next/link"
-import { MemberActions } from "./MemberActions"
-import { GroupHeaderActions } from "./GroupHeaderActions"
-import { Card } from "@/components/ui/Card"
-import { getMercadoPagoFeePercent, isMercadoPagoConfigured } from "@/utils/payment-fees"
-import { formatBillingPeriodLabel, isPaidForPeriod } from "@/utils/billing-period"
-import type { GroupMember, Payment } from "@/types/database"
+import { getSubscriptionDetails } from './actions'
+import { notFound } from 'next/navigation'
+import { ArrowLeft } from 'lucide-react'
+import Link from 'next/link'
+import { MemberActions } from './MemberActions'
+import { GroupHeaderActions } from './GroupHeaderActions'
+import { Card } from '@/components/ui/Card'
+import { getMercadoPagoFeePercent, isMercadoPagoConfigured } from '@/utils/payment-fees'
+import { formatBillingPeriodLabel, isPaidForPeriod } from '@/utils/billing-period'
+import type { GroupMember, Payment } from '@/types/database'
 
-export default async function SubscriptionDetails({
-    params,
-}: {
-    params: Promise<{ id: string }>
-}) {
+export default async function SubscriptionDetails({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
     const group = await getSubscriptionDetails(id)
 
@@ -37,7 +33,10 @@ export default async function SubscriptionDetails({
 
     return (
         <div className="animate-in fade-in zoom-in-95 duration-500 max-w-5xl mx-auto">
-            <Link href="/" className="inline-flex items-center gap-2 text-zinc-400 hover:text-white transition-colors mb-8 group">
+            <Link
+                href="/"
+                className="inline-flex items-center gap-2 text-zinc-400 hover:text-white transition-colors mb-8 group"
+            >
                 <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
                 <span>Volver al Dashboard</span>
             </Link>
@@ -66,7 +65,9 @@ export default async function SubscriptionDetails({
                 <Card className="p-4 sm:p-6 md:col-span-2 shadow-xl" variant="default">
                     <h3 className="text-sm font-medium text-zinc-400 mb-1">Costo total de tu suscripción</h3>
                     <div className="flex items-end gap-2 mt-3">
-                        <p className="text-3xl sm:text-4xl font-bold text-indigo-400">${Number(group.total_price).toFixed(2)}</p>
+                        <p className="text-3xl sm:text-4xl font-bold text-indigo-400">
+                            ${Number(group.total_price).toFixed(2)}
+                        </p>
                         <p className="text-xs sm:text-sm text-zinc-500 mb-1">/ mes</p>
                     </div>
                 </Card>
@@ -128,11 +129,20 @@ export default async function SubscriptionDetails({
                                 const isPaid = isPaidForPeriod(payments, member.id, billingPeriod)
 
                                 return (
-                                    <tr key={member.id} className="border-b border-white/5 hover:bg-white/5 transition-colors group">
+                                    <tr
+                                        key={member.id}
+                                        className="border-b border-white/5 hover:bg-white/5 transition-colors group"
+                                    >
                                         <td className="py-4 px-4 sm:px-6 font-medium text-white">{member.user_name}</td>
-                                        <td className="py-4 px-4 sm:px-6 text-indigo-300 font-medium">${Number(member.quota_amount).toFixed(2)}</td>
-                                        <td className="py-4 px-4 sm:px-6 text-zinc-400 text-sm">{member.whatsapp_number}</td>
-                                        <td className="py-4 px-4 sm:px-6 text-zinc-400 text-sm">{member.email || <span className="text-zinc-600 italic">—</span>}</td>
+                                        <td className="py-4 px-4 sm:px-6 text-indigo-300 font-medium">
+                                            ${Number(member.quota_amount).toFixed(2)}
+                                        </td>
+                                        <td className="py-4 px-4 sm:px-6 text-zinc-400 text-sm">
+                                            {member.whatsapp_number}
+                                        </td>
+                                        <td className="py-4 px-4 sm:px-6 text-zinc-400 text-sm">
+                                            {member.email || <span className="text-zinc-600 italic">—</span>}
+                                        </td>
                                         <td className="py-4 px-4 sm:px-6">
                                             <MemberActions
                                                 member={member}

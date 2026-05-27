@@ -1,30 +1,21 @@
-"use client";
+'use client'
 
-import { signOut } from "@/app/auth/actions";
+import { signOut } from '@/app/auth/actions'
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
-import {
-    LayoutDashboard,
-    CreditCard,
-    Users,
-    Settings,
-    LogOut,
-    Menu,
-    X,
-    Crown,
-} from "lucide-react";
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { useState } from 'react'
+import { LayoutDashboard, CreditCard, Users, Settings, LogOut, Menu, X, Crown } from 'lucide-react'
 
 export function Sidebar() {
-    const pathname = usePathname();
-    const [isOpen, setIsOpen] = useState(false);
+    const pathname = usePathname()
+    const [isOpen, setIsOpen] = useState(false)
 
     const links = [
-        { name: "Inicio", href: "/", icon: LayoutDashboard },
-        { name: "Suscripciones", href: "/subscriptions", icon: Users },
-        { name: "Ajustes", href: "/settings", icon: Settings },
-    ];
+        { name: 'Inicio', href: '/', icon: LayoutDashboard },
+        { name: 'Suscripciones', href: '/subscriptions', icon: Users },
+        { name: 'Ajustes', href: '/settings', icon: Settings },
+    ]
 
     return (
         <>
@@ -38,7 +29,10 @@ export function Sidebar() {
                         Quota
                     </span>
                 </div>
-                <button onClick={() => setIsOpen(!isOpen)} className="p-2 text-foreground/70 bg-surface-hover rounded-lg">
+                <button
+                    onClick={() => setIsOpen(!isOpen)}
+                    className="p-2 text-foreground/70 bg-surface-hover rounded-lg"
+                >
                     {isOpen ? <X size={24} /> : <Menu size={24} />}
                 </button>
             </div>
@@ -54,7 +48,7 @@ export function Sidebar() {
             {/* Sidebar content */}
             <aside
                 className={`w-64 h-screen fixed top-0 left-0 border-r border-border-light flex flex-col p-6 transition-transform duration-300 bg-surface/95 md:bg-surface/80 backdrop-blur-xl z-50 
-                ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
+                ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
             >
                 <div className="flex items-center justify-between mb-12 group">
                     <div className="flex items-center gap-3 cursor-pointer">
@@ -65,37 +59,42 @@ export function Sidebar() {
                             Quota
                         </span>
                     </div>
-                    <button onClick={() => setIsOpen(false)} className="md:hidden p-2 text-foreground/50 hover:text-foreground">
+                    <button
+                        onClick={() => setIsOpen(false)}
+                        className="md:hidden p-2 text-foreground/50 hover:text-foreground"
+                    >
                         <X size={24} />
                     </button>
                 </div>
 
                 <div className="flex-1 space-y-2">
                     {links.map((link) => {
-                        const isDashboardTarget = link.href === "/";
-                        const finalIsActive = isDashboardTarget ? pathname === "/" : pathname.startsWith(link.href);
+                        const isDashboardTarget = link.href === '/'
+                        const finalIsActive = isDashboardTarget ? pathname === '/' : pathname.startsWith(link.href)
 
                         return (
                             <Link
                                 key={link.name}
                                 href={link.href}
                                 onClick={() => setIsOpen(false)}
-                                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative overflow-hidden ${finalIsActive
-                                    ? "text-white bg-primary-600 shadow-md shadow-primary-600/20"
-                                    : "text-foreground/70 hover:bg-surface-hover hover:text-foreground"
-                                    }`}
+                                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative overflow-hidden ${
+                                    finalIsActive
+                                        ? 'text-white bg-primary-600 shadow-md shadow-primary-600/20'
+                                        : 'text-foreground/70 hover:bg-surface-hover hover:text-foreground'
+                                }`}
                             >
                                 {finalIsActive && (
                                     <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out" />
                                 )}
                                 <link.icon
                                     size={20}
-                                    className={`transition-transform duration-300 ${finalIsActive ? "scale-110" : "group-hover:scale-110"
-                                        }`}
+                                    className={`transition-transform duration-300 ${
+                                        finalIsActive ? 'scale-110' : 'group-hover:scale-110'
+                                    }`}
                                 />
                                 <span className="font-medium">{link.name}</span>
                             </Link>
-                        );
+                        )
                     })}
                 </div>
 
@@ -112,7 +111,10 @@ export function Sidebar() {
                     </Link>
 
                     <form action={signOut}>
-                        <button type="submit" className="flex items-center gap-3 px-4 py-3 rounded-xl text-foreground/70 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-500/10 dark:hover:text-red-400 transition-all w-full mt-4">
+                        <button
+                            type="submit"
+                            className="flex items-center gap-3 px-4 py-3 rounded-xl text-foreground/70 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-500/10 dark:hover:text-red-400 transition-all w-full mt-4"
+                        >
                             <LogOut size={20} />
                             <span className="font-medium">Cerrar sesión</span>
                         </button>
@@ -120,5 +122,5 @@ export function Sidebar() {
                 </div>
             </aside>
         </>
-    );
+    )
 }

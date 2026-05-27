@@ -20,11 +20,11 @@ export async function updateSession(request: NextRequest) {
                         request,
                     })
                     cookiesToSet.forEach(({ name, value, options }) =>
-                        supabaseResponse.cookies.set(name, value, options)
+                        supabaseResponse.cookies.set(name, value, options),
                     )
                 },
             },
-        }
+        },
     )
 
     const {
@@ -33,9 +33,7 @@ export async function updateSession(request: NextRequest) {
 
     const pathname = request.nextUrl.pathname
     const isPublicRoute =
-        pathname.startsWith('/login') ||
-        pathname.startsWith('/auth') ||
-        pathname.startsWith('/api/webhooks')
+        pathname.startsWith('/login') || pathname.startsWith('/auth') || pathname.startsWith('/api/webhooks')
 
     if (!user && !isPublicRoute) {
         const url = request.nextUrl.clone()

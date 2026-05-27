@@ -7,7 +7,9 @@ import { getMercadoPagoFeePercent } from '@/utils/payment-fees'
 
 export async function getSettingsData() {
     const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const {
+        data: { user },
+    } = await supabase.auth.getUser()
 
     if (!user) redirect('/login')
 
@@ -25,16 +27,15 @@ export async function getSettingsData() {
 
 export async function updatePaymentAlias(formData: FormData) {
     const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const {
+        data: { user },
+    } = await supabase.auth.getUser()
 
     if (!user) return { error: 'No autorizado' }
 
     const payment_alias = (formData.get('payment_alias') as string)?.trim() || null
 
-    const { error } = await supabase
-        .from('users')
-        .update({ payment_alias })
-        .eq('id', user.id)
+    const { error } = await supabase.from('users').update({ payment_alias }).eq('id', user.id)
 
     if (error) return { error: error.message }
 

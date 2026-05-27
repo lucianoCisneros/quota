@@ -23,11 +23,9 @@ export function formatBillingPeriodLabel(period: string): string {
 export function isPaidForPeriod(
     payments: { member_id: string; status: string; billing_period: string }[] | undefined,
     memberId: string,
-    period: string
+    period: string,
 ): boolean {
     return (
-        payments?.some(
-            (p) => p.member_id === memberId && p.status === 'PAID' && p.billing_period === period
-        ) ?? false
+        payments?.some((p) => p.member_id === memberId && p.status === 'PAID' && p.billing_period === period) ?? false
     )
 }

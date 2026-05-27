@@ -41,12 +41,7 @@ export default async function EditSubscriptionPage({
                     </div>
                 )}
                 <form action={updateGroup} className="space-y-6">
-                    <Input
-                        label="Nombre del grupo"
-                        name="name"
-                        defaultValue={group.name}
-                        required
-                    />
+                    <Input label="Nombre del grupo" name="name" defaultValue={group.name} required />
                     <Input
                         label="Costo total mensual ($)"
                         name="total_price"

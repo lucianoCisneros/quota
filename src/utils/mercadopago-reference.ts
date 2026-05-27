@@ -1,10 +1,6 @@
 import { getCurrentBillingPeriod } from '@/utils/billing-period'
 
-export function buildExternalReference(
-    groupId: string,
-    memberId: string,
-    billingPeriod: string
-): string {
+export function buildExternalReference(groupId: string, memberId: string, billingPeriod: string): string {
     return `${groupId}|${memberId}|${billingPeriod}`
 }
 

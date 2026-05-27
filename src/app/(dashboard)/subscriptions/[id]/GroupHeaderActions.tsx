@@ -24,21 +24,12 @@ export function GroupHeaderActions({ groupId }: { groupId: string }) {
                 </Button>
             </Link>
             {!showConfirm ? (
-                <Button
-                    variant="danger"
-                    className="flex-1 md:flex-none"
-                    onClick={() => setShowConfirm(true)}
-                >
+                <Button variant="danger" className="flex-1 md:flex-none" onClick={() => setShowConfirm(true)}>
                     Eliminar
                 </Button>
             ) : (
                 <div className="flex gap-2 flex-1 md:flex-none">
-                    <Button
-                        variant="danger"
-                        className="flex-1"
-                        isLoading={isPending}
-                        onClick={handleDelete}
-                    >
+                    <Button variant="danger" className="flex-1" isLoading={isPending} onClick={handleDelete}>
                         Confirmar
                     </Button>
                     <Button variant="secondary" onClick={() => setShowConfirm(false)} disabled={isPending}>
