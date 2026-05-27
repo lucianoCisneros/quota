@@ -99,7 +99,7 @@ export default async function SubscriptionDetails({
                 </div>
             )}
 
-            <h2 className="text-xl font-semibold mb-2">Amigos (Participantes)</h2>
+            <h2 className="text-xl font-semibold mb-2">Integrantes</h2>
             <p className="text-sm text-zinc-500 mb-6">
                 El botón de WhatsApp envía transferencia y Mercado Pago en un solo mensaje.
             </p>

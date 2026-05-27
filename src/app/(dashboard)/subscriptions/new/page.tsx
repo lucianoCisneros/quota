@@ -131,7 +131,7 @@ export default function NewSubscription() {
 
                                 {/* Participants */}
                                 <div>
-                                    <h3 className="text-lg font-medium mb-4">Amigos (Participantes)</h3>
+                                    <h3 className="text-lg font-medium mb-4">Integrantes</h3>
                                     <div className="space-y-4">
                                         {members.map((member) => (
                                             <div key={member.id} className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-start p-4 sm:p-0 rounded-xl bg-white/5 sm:bg-transparent border border-white/5 sm:border-none">
