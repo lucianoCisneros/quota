@@ -23,6 +23,7 @@ export type GroupMember = {
     group_id: string
     user_name: string
     whatsapp_number: string | null
+    email: string | null
     quota_amount: number
     created_at: string
 }

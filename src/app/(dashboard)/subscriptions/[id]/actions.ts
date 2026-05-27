@@ -219,6 +219,42 @@ export async function updateSubscriptionGroup(groupId: string, formData: FormDat
     redirect(`/subscriptions/${groupId}`)
 }
 
+export async function updateMember(
+    memberId: string,
+    groupId: string,
+    formData: FormData
+) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { success: false, error: 'No autorizado.' }
+
+    const ownership = await assertGroupOwner(supabase, user.id, groupId)
+    if (!ownership.ok) return { success: false, error: ownership.error }
+
+    const user_name = (formData.get('user_name') as string)?.trim()
+    const whatsapp_number = (formData.get('whatsapp_number') as string)?.trim() || null
+    const email = (formData.get('email') as string)?.trim() || null
+
+    if (!user_name) {
+        return { success: false, error: 'El nombre es obligatorio.' }
+    }
+
+    const { error } = await supabase
+        .from('group_members')
+        .update({ user_name, whatsapp_number, email })
+        .eq('id', memberId)
+        .eq('group_id', groupId)
+
+    if (error) {
+        return { success: false, error: error.message }
+    }
+
+    revalidatePath(`/subscriptions/${groupId}`)
+    revalidatePath('/')
+    revalidatePath('/participants')
+    return { success: true }
+}
+
 export async function deleteSubscriptionGroup(groupId: string) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()

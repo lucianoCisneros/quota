@@ -22,7 +22,7 @@ export function Sidebar() {
 
     const links = [
         { name: "Inicio", href: "/", icon: LayoutDashboard },
-        { name: "Participantes", href: "/participants", icon: Users },
+        { name: "Suscripciones", href: "/subscriptions", icon: Users },
         { name: "Ajustes", href: "/settings", icon: Settings },
     ];
 

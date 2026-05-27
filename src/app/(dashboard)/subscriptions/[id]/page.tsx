@@ -64,7 +64,7 @@ export default async function SubscriptionDetails({
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
                 <Card className="p-4 sm:p-6 md:col-span-2 shadow-xl" variant="default">
-                    <h3 className="text-sm font-medium text-zinc-400 mb-1">Costo de tu {group.services?.name || group.name}</h3>
+                    <h3 className="text-sm font-medium text-zinc-400 mb-1">Costo total de tu suscripción</h3>
                     <div className="flex items-end gap-2 mt-3">
                         <p className="text-3xl sm:text-4xl font-bold text-indigo-400">${Number(group.total_price).toFixed(2)}</p>
                         <p className="text-xs sm:text-sm text-zinc-500 mb-1">/ mes</p>
@@ -72,10 +72,10 @@ export default async function SubscriptionDetails({
                 </Card>
 
                 <Card className="p-4 sm:p-6 flex flex-col justify-center shadow-xl" variant="default">
-                    <h3 className="text-sm font-medium text-zinc-400 mb-1">Tus amigos te deben</h3>
+                    <h3 className="text-sm font-medium text-zinc-400 mb-1">Los participantes te deben</h3>
                     <p className="text-2xl sm:text-3xl font-bold text-orange-400">${pendingAmount.toFixed(2)}</p>
                     <p className="text-xs text-zinc-500 mt-1">
-                        por cobrar · {paidCount}/{members.length} pagaron este mes
+                        {paidCount}/{members.length} pagaron este mes
                     </p>
                 </Card>
             </div>
@@ -105,19 +105,20 @@ export default async function SubscriptionDetails({
             </p>
             <Card className="shadow-xl" variant="default">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse min-w-[600px] md:min-w-0">
+                    <table className="w-full text-left border-collapse min-w-[700px] md:min-w-0">
                         <thead>
                             <tr className="border-b border-white/10 bg-black/20 text-sm text-zinc-400">
                                 <th className="py-4 px-4 sm:px-6 font-medium">Nombre</th>
                                 <th className="py-4 px-4 sm:px-6 font-medium">Cuota</th>
                                 <th className="py-4 px-4 sm:px-6 font-medium">WhatsApp</th>
+                                <th className="py-4 px-4 sm:px-6 font-medium">Email</th>
                                 <th className="py-4 px-4 sm:px-6 font-medium text-right">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
                             {members.length === 0 ? (
                                 <tr>
-                                    <td colSpan={4} className="py-8 text-center text-zinc-500 italic">
+                                    <td colSpan={5} className="py-8 text-center text-zinc-500 italic">
                                         No hay amigos en este grupo. ¡Pagas todo tú!
                                     </td>
                                 </tr>
@@ -131,6 +132,7 @@ export default async function SubscriptionDetails({
                                         <td className="py-4 px-4 sm:px-6 font-medium text-white">{member.user_name}</td>
                                         <td className="py-4 px-4 sm:px-6 text-indigo-300 font-medium">${Number(member.quota_amount).toFixed(2)}</td>
                                         <td className="py-4 px-4 sm:px-6 text-zinc-400 text-sm">{member.whatsapp_number}</td>
+                                        <td className="py-4 px-4 sm:px-6 text-zinc-400 text-sm">{member.email || <span className="text-zinc-600 italic">—</span>}</td>
                                         <td className="py-4 px-4 sm:px-6">
                                             <MemberActions
                                                 member={member}

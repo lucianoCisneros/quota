@@ -94,7 +94,7 @@ export async function createSubscriptionGroup(formData: FormData) {
         return { error: 'Completá nombre y precio válidos.' }
     }
 
-    let members: { name: string; whatsapp: string }[] = []
+    let members: { name: string; whatsapp: string; email: string }[] = []
     try {
         const membersDataString = formData.get('membersData') as string
         members = membersDataString ? JSON.parse(membersDataString) : []
@@ -123,6 +123,7 @@ export async function createSubscriptionGroup(formData: FormData) {
             group_id: group.id,
             user_name: m.name,
             whatsapp_number: m.whatsapp,
+            email: m.email || null,
             quota_amount,
         }))
 

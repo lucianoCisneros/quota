@@ -1,14 +1,15 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { MessageCircle, Link as LinkIcon, Check } from 'lucide-react'
+import { MessageCircle, Link as LinkIcon, Check, Pencil } from 'lucide-react'
 import Link from 'next/link'
 import { createPaymentLink, togglePaymentStatus } from './actions'
 import { Button } from '@/components/ui/Button'
 import { formatArs, calculateMercadoPagoGrossAmount } from '@/utils/payment-fees'
+import { MemberEditDialog } from './MemberEditDialog'
 
 type MemberActionsProps = {
-    member: { id: string; user_name: string; whatsapp_number?: string | null; quota_amount: number }
+    member: { id: string; user_name: string; whatsapp_number?: string | null; email?: string | null; quota_amount: number }
     group: { id: string; name: string }
     isPaid: boolean
     paymentAlias: string | null
@@ -103,6 +104,7 @@ export function MemberActions({
     const [loading, setLoading] = useState(false)
     const [linkCopied, setLinkCopied] = useState(false)
     const [isPending, startTransition] = useTransition()
+    const [showEdit, setShowEdit] = useState(false)
 
     const netAmount = Number(member.quota_amount)
 
@@ -159,52 +161,70 @@ export function MemberActions({
     }
 
     return (
-        <div className="flex flex-col items-end gap-2">
-            {!isPaid && !paymentAlias && (
-                <Link
-                    href="/settings"
-                    className="text-xs text-amber-400/90 hover:text-amber-300 underline-offset-2 hover:underline"
-                >
-                    Configurá tu alias para cobrar
-                </Link>
-            )}
-            <div className="flex gap-2 justify-end items-center flex-wrap">
-                {!isPaid && (
-                    <>
-                        <Button
-                            onClick={handleWhatsApp}
-                            title="Enviar opciones de pago por WhatsApp"
-                            disabled={loading || isPending || !paymentAlias}
-                            variant="ghost"
-                            className="text-green-500 hover:text-green-400 disabled:opacity-40"
-                        >
-                            <MessageCircle size={18} />
-                        </Button>
-                        <Button
-                            onClick={copyPaymentMessage}
-                            title="Copiar mensaje de cobro"
-                            disabled={loading || isPending || !paymentAlias}
-                            variant="ghost"
-                            className="text-indigo-400 hover:text-indigo-300 disabled:opacity-40"
-                        >
-                            {linkCopied ? (
-                                <Check size={18} className="text-green-400" />
-                            ) : (
-                                <LinkIcon size={18} />
-                            )}
-                        </Button>
-                    </>
+        <>
+            <div className="flex flex-col items-end gap-2">
+                {!isPaid && !paymentAlias && (
+                    <Link
+                        href="/settings"
+                        className="text-xs text-amber-400/90 hover:text-amber-300 underline-offset-2 hover:underline"
+                    >
+                        Configurá tu alias para cobrar
+                    </Link>
                 )}
-                <Button
-                    onClick={handleTogglePayment}
-                    isLoading={isPending}
-                    variant="secondary"
-                    size="sm"
-                    className={`ml-2 ${isPaid ? 'text-green-400 border-green-500/20 bg-green-500/5' : 'text-white'}`}
-                >
-                    {isPaid ? '✓ Pagado' : 'Marcar Pagado'}
-                </Button>
+                <div className="flex gap-2 justify-end items-center flex-wrap">
+                    <Button
+                        onClick={() => setShowEdit(true)}
+                        title="Editar participante"
+                        variant="ghost"
+                        className="text-zinc-400 hover:text-white"
+                    >
+                        <Pencil size={16} />
+                    </Button>
+                    {!isPaid && (
+                        <>
+                            <Button
+                                onClick={handleWhatsApp}
+                                title="Enviar opciones de pago por WhatsApp"
+                                disabled={loading || isPending || !paymentAlias}
+                                variant="ghost"
+                                className="text-green-500 hover:text-green-400 disabled:opacity-40"
+                            >
+                                <MessageCircle size={18} />
+                            </Button>
+                            <Button
+                                onClick={copyPaymentMessage}
+                                title="Copiar mensaje de cobro"
+                                disabled={loading || isPending || !paymentAlias}
+                                variant="ghost"
+                                className="text-indigo-400 hover:text-indigo-300 disabled:opacity-40"
+                            >
+                                {linkCopied ? (
+                                    <Check size={18} className="text-green-400" />
+                                ) : (
+                                    <LinkIcon size={18} />
+                                )}
+                            </Button>
+                        </>
+                    )}
+                    <Button
+                        onClick={handleTogglePayment}
+                        isLoading={isPending}
+                        variant="secondary"
+                        size="sm"
+                        className={`ml-2 ${isPaid ? 'text-green-400 border-green-500/20 bg-green-500/5' : 'text-white'}`}
+                    >
+                        {isPaid ? '✓ Pagado' : 'Marcar Pagado'}
+                    </Button>
+                </div>
             </div>
-        </div>
+
+            {showEdit && (
+                <MemberEditDialog
+                    member={member}
+                    groupId={group.id}
+                    onClose={() => setShowEdit(false)}
+                />
+            )}
+        </>
     )
 }

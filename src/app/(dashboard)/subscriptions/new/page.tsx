@@ -26,7 +26,7 @@ function SubmitButton() {
 
 export default function NewSubscription() {
     const [services, setServices] = useState<any[]>([]);
-    const [members, setMembers] = useState([{ id: 1, name: "", whatsapp: "" }]);
+    const [members, setMembers] = useState([{ id: 1, name: "", whatsapp: "", email: "" }]);
     const [totalPrice, setTotalPrice] = useState<string>("");
     const [error, setError] = useState<string>("");
 
@@ -35,7 +35,7 @@ export default function NewSubscription() {
     }, []);
 
     const addMember = () => {
-        setMembers([...members, { id: Date.now(), name: "", whatsapp: "" }]);
+        setMembers([...members, { id: Date.now(), name: "", whatsapp: "", email: "" }]);
     };
 
     const removeMember = (id: number) => {
@@ -146,6 +146,13 @@ export default function NewSubscription() {
                                                     type="tel"
                                                     value={member.whatsapp}
                                                     onChange={(e) => updateMember(member.id, 'whatsapp', e.target.value)}
+                                                    className="text-sm"
+                                                />
+                                                <Input
+                                                    placeholder="Email (opcional)"
+                                                    type="email"
+                                                    value={member.email}
+                                                    onChange={(e) => updateMember(member.id, 'email', e.target.value)}
                                                     className="text-sm"
                                                 />
                                                 {members.length > 1 && (
