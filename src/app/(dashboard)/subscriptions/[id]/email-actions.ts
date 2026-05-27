@@ -1,7 +1,7 @@
 'use server'
 
 import { Resend } from 'resend'
-import { buildPaymentEmail } from '@/utils/build-payment-email'
+import { buildPaymentEmail } from '@/utils/payment-email'
 import { calculateMercadoPagoGrossAmount, getMercadoPagoFeePercent } from '@/utils/payment-fees'
 import { createPaymentLink } from './actions'
 import type { GroupMember } from '@/types/database'
@@ -13,7 +13,7 @@ export async function sendPaymentEmail(
     member: EmailMember,
     group: EmailGroup,
     paymentAlias: string,
-    periodLabel: string
+    periodLabel: string,
 ) {
     if (!member.email) {
         return { success: false, error: 'El miembro no tiene email registrado.' }
@@ -27,7 +27,7 @@ export async function sendPaymentEmail(
         // Create MP payment link
         const paymentLinkResponse = await createPaymentLink(
             { id: member.id, user_name: member.user_name, quota_amount: member.quota_amount },
-            { id: group.id, name: group.name }
+            { id: group.id, name: group.name },
         )
 
         const netAmount = Number(member.quota_amount)

@@ -11,17 +11,8 @@ export type PaymentEmailParams = {
 }
 
 export function buildPaymentEmail(params: PaymentEmailParams): string {
-    const {
-        memberName,
-        groupName,
-        periodLabel,
-        netAmount,
-        grossAmount,
-        feeAmount,
-        feePercent,
-        paymentAlias,
-        mpLink,
-    } = params
+    const { memberName, groupName, periodLabel, netAmount, grossAmount, feeAmount, feePercent, paymentAlias, mpLink } =
+        params
 
     const formattedNet = netAmount.toFixed(2)
     const formattedGross = grossAmount.toFixed(2)
