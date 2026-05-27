@@ -8,7 +8,7 @@ export async function recordMemberPayment(
         billingPeriod: string
         amount: number
         preferenceId?: string | null
-    }
+    },
 ): Promise<{ created: boolean }> {
     const { groupId, memberId, billingPeriod, amount, preferenceId } = params
 
