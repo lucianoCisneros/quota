@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { MessageCircle, Link as LinkIcon, Check, Pencil } from 'lucide-react'
+import { MessageCircle, Link as LinkIcon, Check, Pencil, Mail } from 'lucide-react'
 import Link from 'next/link'
 import { createPaymentLink, togglePaymentStatus } from './actions'
+import { sendPaymentEmail } from './email-actions'
 import { Button } from '@/components/ui/Button'
 import { formatArs, calculateMercadoPagoGrossAmount } from '@/utils/payment-fees'
 import { MemberEditDialog } from './MemberEditDialog'
@@ -102,6 +103,8 @@ export function MemberActions({
     periodLabel,
 }: MemberActionsProps) {
     const [loading, setLoading] = useState(false)
+    const [emailLoading, setEmailLoading] = useState(false)
+    const [emailSent, setEmailSent] = useState(false)
     const [linkCopied, setLinkCopied] = useState(false)
     const [isPending, startTransition] = useTransition()
     const [showEdit, setShowEdit] = useState(false)
@@ -154,6 +157,32 @@ export function MemberActions({
         setTimeout(() => setLinkCopied(false), 2000)
     }
 
+    const handleEmail = async () => {
+        if (!member.email) {
+            alert('Este miembro no tiene email registrado.')
+            return
+        }
+
+        if (!paymentAlias) {
+            alert('Configurá tu alias en Ajustes para incluir la opción de transferencia en el email.')
+            return
+        }
+
+        setEmailLoading(true)
+        setEmailSent(false)
+
+        const result = await sendPaymentEmail(member, group, paymentAlias, periodLabel)
+
+        setEmailLoading(false)
+
+        if (result.success) {
+            setEmailSent(true)
+            setTimeout(() => setEmailSent(false), 3000)
+        } else {
+            alert(result.error ?? 'Error al enviar el email.')
+        }
+    }
+
     const handleTogglePayment = () => {
         startTransition(() => {
             togglePaymentStatus(member.id, group.id, netAmount)
@@ -191,6 +220,21 @@ export function MemberActions({
                             >
                                 <MessageCircle size={18} />
                             </Button>
+                            {member.email && (
+                                <Button
+                                    onClick={handleEmail}
+                                    title="Enviar opciones de pago por email"
+                                    disabled={emailLoading || isPending || !paymentAlias}
+                                    variant="ghost"
+                                    className="text-blue-400 hover:text-blue-300 disabled:opacity-40"
+                                >
+                                    {emailSent ? (
+                                        <Check size={18} className="text-green-400" />
+                                    ) : (
+                                        <Mail size={18} />
+                                    )}
+                                </Button>
+                            )}
                             <Button
                                 onClick={copyPaymentMessage}
                                 title="Copiar mensaje de cobro"
