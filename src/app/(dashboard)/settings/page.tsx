@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
-import { getSettingsData } from './actions'
+import { getSettingsData } from './settings.actions'
 import { Card } from '@/components/ui/Card'
 import { PaymentAliasForm } from './PaymentAliasForm'
 

@@ -1,7 +1,7 @@
-import { login, signup } from './actions'
+import { login, signup } from './login.actions'
 import { Activity } from 'lucide-react'
 
-export default async function LoginPage({ searchParams }: { searchParams: Promise<{ message: string }> }) {
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ message?: string }> }) {
     const { message } = await searchParams
 
     return (

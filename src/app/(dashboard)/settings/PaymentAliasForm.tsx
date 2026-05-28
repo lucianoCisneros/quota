@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { updatePaymentAlias } from './actions'
+import { updatePaymentAlias } from './settings.actions'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 
