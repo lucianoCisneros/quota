@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
-import { getSubscriptionDetails, updateSubscriptionGroup } from '../actions'
+import { getSubscriptionDetails, updateSubscriptionGroup } from '../subscription-detail.actions'
 import { Card } from '@/components/ui/Card'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'

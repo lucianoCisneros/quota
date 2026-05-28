@@ -5,7 +5,7 @@ import { ArrowLeft, Plus, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useFormStatus } from 'react-dom'
 import type { Service } from '@/types/database'
-import { createSubscriptionGroup, getServices } from '../../actions'
+import { createSubscriptionGroup, getServices } from '../../dashboard.actions'
 import { Card, Button, Input, Select } from '@/components/ui'
 
 function SubmitButton() {
@@ -35,7 +35,7 @@ export default function NewSubscription() {
         setMembers(members.filter((m) => m.id !== id))
     }
 
-    const updateMember = (id: number, field: string, value: string) => {
+    const updateMember = (id: number, field: 'name' | 'whatsapp' | 'email', value: string) => {
         setMembers(members.map((m) => (m.id === id ? { ...m, [field]: value } : m)))
     }
 

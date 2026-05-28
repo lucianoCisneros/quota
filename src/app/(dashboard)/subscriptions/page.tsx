@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { getAllSubscriptions } from './actions'
+import { getAllSubscriptions } from './subscriptions.actions'
 import { formatBillingPeriodLabel } from '@/utils/billing-period'
 import { Card } from '@/components/ui/Card'
 
