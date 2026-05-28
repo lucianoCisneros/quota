@@ -120,9 +120,11 @@ export async function createPaymentLink(member: PaymentLinkMember, group: Paymen
             },
         })
 
+        const isSandbox = process.env.MERCADOPAGO_USE_SANDBOX === 'true'
+
         return {
             success: true,
-            link: response.init_point,
+            link: isSandbox ? response.sandbox_init_point! : response.init_point!,
             billingPeriod,
             ...breakdown,
         }
