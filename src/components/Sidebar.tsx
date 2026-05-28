@@ -1,6 +1,6 @@
 'use client'
 
-import { signOut } from '@/app/auth/actions'
+import { signOut } from '@/app/auth/auth.actions'
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'

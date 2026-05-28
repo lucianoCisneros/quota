@@ -1,6 +1,6 @@
 import { Plus, TrendingUp, CreditCard, Users, Crown } from 'lucide-react'
 import Link from 'next/link'
-import { getDashboardData } from './actions'
+import { getDashboardData } from './dashboard.actions'
 import { Card } from '@/components/ui/Card'
 import { formatBillingPeriodLabel } from '@/utils/billing-period'
 
