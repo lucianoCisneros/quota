@@ -5,13 +5,13 @@ import { redirect } from 'next/navigation'
 import { getCurrentBillingPeriod, isPaidForPeriod } from '@/utils/billing-period'
 import type { GroupMember, Group, Payment } from '@/types/database'
 
-export type ParticipantRow = GroupMember & {
+export type MemberRow = GroupMember & {
     group: Pick<Group, 'id' | 'name' | 'billing_cycle_day'>
     isPaid: boolean
     billingPeriod: string
 }
 
-export async function getAllParticipants() {
+export async function getAllMembers() {
     const supabase = await createClient()
     const {
         data: { user },
@@ -34,11 +34,11 @@ export async function getAllParticipants() {
         .eq('creator_id', user.id)
         .order('name')
 
-    const participants: ParticipantRow[] = []
+    const members: MemberRow[] = []
 
     for (const group of groups ?? []) {
         for (const member of group.group_members ?? []) {
-            participants.push({
+            members.push({
                 ...(member as GroupMember),
                 group: {
                     id: group.id,
@@ -51,5 +51,5 @@ export async function getAllParticipants() {
         }
     }
 
-    return { participants, billingPeriod }
+    return { members, billingPeriod }
 }
