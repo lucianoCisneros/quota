@@ -167,7 +167,7 @@ export async function togglePaymentStatus(memberId: string, groupId: string, amo
 
     revalidatePath(`/subscriptions/${groupId}`)
     revalidatePath('/')
-    revalidatePath('/participants')
+    revalidatePath('/members')
     return { success: true }
 }
 
@@ -250,7 +250,7 @@ export async function updateMember(memberId: string, groupId: string, formData: 
 
     revalidatePath(`/subscriptions/${groupId}`)
     revalidatePath('/')
-    revalidatePath('/participants')
+    revalidatePath('/members')
     return { success: true }
 }
 
