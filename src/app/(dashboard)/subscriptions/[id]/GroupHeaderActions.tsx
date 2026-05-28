@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
-import { deleteSubscriptionGroup } from './actions'
+import { deleteSubscriptionGroup } from './subscription-detail.actions'
 import { Button } from '@/components/ui/Button'
 
 export function GroupHeaderActions({ groupId }: { groupId: string }) {

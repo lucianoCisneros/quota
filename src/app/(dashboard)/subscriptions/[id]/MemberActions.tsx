@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { MessageCircle, Link as LinkIcon, Check, Pencil, Mail } from 'lucide-react'
 import Link from 'next/link'
-import { createPaymentLink, togglePaymentStatus } from './actions'
+import { createPaymentLink, togglePaymentStatus } from './subscription-detail.actions'
 import { sendPaymentEmail } from './email-actions'
 import { Button } from '@/components/ui/Button'
 import { formatArs, calculateMercadoPagoGrossAmount } from '@/utils/payment-fees'

@@ -3,7 +3,7 @@
 import { Resend } from 'resend'
 import { buildPaymentEmail } from '@/utils/payment-email'
 import { calculateMercadoPagoGrossAmount, getMercadoPagoFeePercent } from '@/utils/payment-fees'
-import { createPaymentLink } from './actions'
+import { createPaymentLink } from './subscription-detail.actions'
 import type { GroupMember } from '@/types/database'
 
 type EmailMember = Pick<GroupMember, 'id' | 'user_name' | 'quota_amount'> & { email?: string | null }

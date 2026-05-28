@@ -1,4 +1,4 @@
-import { getSubscriptionDetails } from './actions'
+import { getSubscriptionDetails } from './subscription-detail.actions'
 import { notFound } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
@@ -102,7 +102,7 @@ export default async function SubscriptionDetails({ params }: { params: Promise<
 
             <h2 className="text-xl font-semibold mb-2">Integrantes</h2>
             <p className="text-sm text-zinc-500 mb-6">
-                El botón de WhatsApp envía transferencia y Mercado Pago en un solo mensaje.
+                El botón de WhatsApp envía tus datos para la transferencia y el link de Mercado Pago en un solo mensaje.
             </p>
             <Card className="shadow-xl" variant="default">
                 <div className="overflow-x-auto">

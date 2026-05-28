@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { X } from 'lucide-react'
-import { updateMember } from './actions'
+import { updateMember } from './subscription-detail.actions'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 
