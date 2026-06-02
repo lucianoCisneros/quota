@@ -1,4 +1,20 @@
-// DEPRECATED: middleware was moved to src/middleware.ts
-// This file is kept as a reference and will be removed in a future cleanup.
-// Next.js requires middleware at the root of src/ to execute it.
-export {}
+import { type NextRequest } from 'next/server'
+import { updateSession } from '@/utils/supabase/middleware'
+
+export async function proxy(request: NextRequest) {
+    return await updateSession(request)
+}
+
+export const config = {
+    matcher: [
+        /*
+         * Match all request paths except:
+         * - _next/static (static files)
+         * - _next/image (image optimization files)
+         * - favicon.ico (favicon file)
+         * - api/webhooks (Mercado Pago webhooks — auth-agnostic)
+         * - Static files (svg, png, jpg, jpeg, gif, webp)
+         */
+        '/((?!_next/static|_next/image|favicon.ico|api/webhooks|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    ],
+}

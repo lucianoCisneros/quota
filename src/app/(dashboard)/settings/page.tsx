@@ -3,6 +3,7 @@ import { ArrowLeft } from 'lucide-react'
 import { getSettingsData } from './settings.actions'
 import { Card } from '@/components/ui/Card'
 import { PaymentAliasForm } from './PaymentAliasForm'
+import { MpConnectSection } from './MpConnectSection'
 
 export default async function SettingsPage() {
     const { profile, mpFeePercent } = await getSettingsData()
@@ -28,41 +29,12 @@ export default async function SettingsPage() {
                 <PaymentAliasForm initialAlias={profile?.payment_alias ?? ''} />
             </Card>
 
-            <Card className="p-6 mt-6 text-sm text-zinc-400 border border-white/5" variant="default">
-                <h3 className="font-medium text-white mb-2">Mercado Pago (link de pago)</h3>
-                <p className="leading-relaxed mb-4">
-                    Para generar el link en los mensajes de WhatsApp, agregá en{' '}
-                    <code className="text-zinc-300">.env.local</code>:
-                </p>
-                <pre className="p-3 rounded-lg bg-black/30 text-xs text-zinc-300 overflow-x-auto mb-4">
-                    MERCADOPAGO_ACCESS_TOKEN=tu_access_token
-                </pre>
-                <p className="leading-relaxed mb-4">
-                    Para marcar pagos automáticos desde Mercado Pago, agregá también{' '}
-                    <code className="text-zinc-300">SUPABASE_SERVICE_ROLE_KEY</code> y configurá el webhook en MP
-                    apuntando a <code className="text-zinc-300">/api/webhooks/mercadopago</code> (ver README).
-                </p>
-                <p className="leading-relaxed mb-4">
-                    Obtenelo en{' '}
-                    <a
-                        href="https://www.mercadopago.com.ar/developers/panel/app"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-indigo-400 hover:text-indigo-300 underline"
-                    >
-                        Mercado Pago Developers
-                    </a>{' '}
-                    (tu aplicación → Credenciales → Access Token). Reiniciá{' '}
-                    <code className="text-zinc-300">npm run dev</code> después de guardar.
-                </p>
-                <h3 className="font-medium text-white mb-2">Comisión de Mercado Pago</h3>
-                <p className="leading-relaxed">
-                    Quota estima una comisión del <span className="text-indigo-300 font-medium">{mpFeePercent}%</span> y
-                    la suma al monto que paga tu amigo, para que vos recibas la cuota completa. Podés ajustar el
-                    porcentaje con la variable <code className="text-zinc-300">MERCADOPAGO_FEE_PERCENT</code> en tu
-                    archivo de entorno.
-                </p>
-            </Card>
+            <MpConnectSection
+                mpConnected={profile?.mp_connected ?? false}
+                mpUserId={profile?.mp_user_id ?? null}
+                mpConnectedAt={profile?.mp_connected_at ?? null}
+                mpFeePercent={mpFeePercent}
+            />
         </div>
     )
 }

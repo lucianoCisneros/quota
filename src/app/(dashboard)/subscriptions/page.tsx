@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { getAllSubscriptions } from './subscriptions.actions'
 import { formatBillingPeriodLabel } from '@/utils/billing-period'
 import { Card } from '@/components/ui/Card'
+import { SendRemindersButton } from '@/components/ui/SendRemindersButton'
 
 export default async function SubscriptionsPage() {
     const { subscriptions, billingPeriod } = await getAllSubscriptions()
@@ -9,12 +10,15 @@ export default async function SubscriptionsPage() {
 
     return (
         <div className="animate-in fade-in zoom-in-95 duration-500 max-w-5xl mx-auto">
-            <header className="mb-10">
-                <h1 className="text-3xl font-bold tracking-tight mb-2">Suscripciones</h1>
-                <p className="text-zinc-400">
-                    Todos tus grupos en un solo lugar • periódo de cobro:{' '}
-                    <span className="text-white font-medium">{periodLabel}</span>
-                </p>
+            <header className="mb-10 flex items-start justify-between gap-4">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight mb-2">Suscripciones</h1>
+                    <p className="text-zinc-400">
+                        Todos tus grupos en un solo lugar • periódo de cobro:{' '}
+                        <span className="text-white font-medium">{periodLabel}</span>
+                    </p>
+                </div>
+                <SendRemindersButton />
             </header>
 
             <Card className="shadow-xl overflow-hidden" variant="default">

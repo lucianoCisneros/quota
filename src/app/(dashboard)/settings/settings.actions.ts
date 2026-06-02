@@ -1,9 +1,11 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/server'
+import { createAdminClient } from '@/utils/supabase/admin'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { getMercadoPagoFeePercent } from '@/utils/payment-fees'
+import { isUserMpConnected } from '@/lib/mercadopago-client'
 
 export async function getSettingsData() {
     const supabase = await createClient()
@@ -15,12 +17,19 @@ export async function getSettingsData() {
 
     const { data: profile } = await supabase
         .from('users')
-        .select('email, name, payment_alias')
+        .select('email, name, payment_alias, mp_user_id, mp_connected_at')
         .eq('id', user.id)
         .single()
 
+    const mpConnected = await isUserMpConnected(user.id)
+
     return {
-        profile,
+        profile: {
+            ...profile,
+            mp_connected: mpConnected,
+            mp_user_id: profile?.mp_user_id ?? null,
+            mp_connected_at: profile?.mp_connected_at ?? null,
+        },
         mpFeePercent: getMercadoPagoFeePercent(),
     }
 }
@@ -41,5 +50,36 @@ export async function updatePaymentAlias(formData: FormData) {
 
     revalidatePath('/settings')
     revalidatePath('/', 'layout')
+    return { success: true }
+}
+
+export async function disconnectMercadoPago(): Promise<{ success: boolean; error?: string }> {
+    const supabase = await createClient()
+    const {
+        data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) return { success: false, error: 'No autorizado.' }
+
+    const admin = createAdminClient()
+    const { error } = await admin
+        .from('users')
+        .update({
+            mp_access_token_encrypted: null,
+            mp_refresh_token_encrypted: null,
+            mp_user_id: null,
+            mp_token_expires_at: null,
+            mp_connected_at: null,
+        })
+        .eq('id', user.id)
+
+    if (error) {
+        console.error('[Disconnect MP] Error:', error)
+        return { success: false, error: 'Error al desconectar Mercado Pago.' }
+    }
+
+    revalidatePath('/settings')
+    revalidatePath('/', 'layout')
+
     return { success: true }
 }

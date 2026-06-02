@@ -8,11 +8,6 @@ export type MercadoPagoAmountBreakdown = {
     feePercent: number
 }
 
-export function isMercadoPagoConfigured(): boolean {
-    const token = process.env.MERCADOPAGO_ACCESS_TOKEN
-    return Boolean(token && token !== 'TU_TOKEN_AQUI')
-}
-
 export function getMercadoPagoFeePercent(): number {
     const raw = process.env.MERCADOPAGO_FEE_PERCENT ?? process.env.NEXT_PUBLIC_MERCADOPAGO_FEE_PERCENT
 

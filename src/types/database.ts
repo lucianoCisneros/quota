@@ -52,4 +52,14 @@ export type UserProfile = {
     name: string | null
     payment_alias: string | null
     tier: 'free' | 'premium'
+    /** Encrypted Mercado Pago access token (AES-256-GCM) */
+    mp_access_token_encrypted: string | null
+    /** Encrypted Mercado Pago refresh token (AES-256-GCM) */
+    mp_refresh_token_encrypted: string | null
+    /** Mercado Pago user/collector ID */
+    mp_user_id: string | null
+    /** Timestamp when the current MP access token expires */
+    mp_token_expires_at: string | null
+    /** Timestamp when the user first connected their MP account */
+    mp_connected_at: string | null
 }

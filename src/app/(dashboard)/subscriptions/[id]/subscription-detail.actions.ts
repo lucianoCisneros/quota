@@ -3,13 +3,14 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
-import { MercadoPagoConfig, Preference } from 'mercadopago'
+import { Preference } from 'mercadopago'
 import { calculateMercadoPagoGrossAmount, getMercadoPagoFeePercent } from '@/utils/payment-fees'
 import { getCurrentBillingPeriod } from '@/utils/billing-period'
 import { assertGroupOwner } from '@/utils/group-auth'
 import { buildExternalReference } from '@/utils/mercadopago-reference'
 import { getAppUrl } from '@/utils/app-url'
 import { recordMemberPayment } from '@/lib/record-payment'
+import { getUserMercadoPagoClient } from '@/lib/mercadopago-client'
 import type { GroupMember } from '@/types/database'
 
 type PaymentLinkMember = Pick<GroupMember, 'id' | 'user_name' | 'quota_amount'>
@@ -41,9 +42,13 @@ export async function getSubscriptionDetails(id: string) {
 
     const { data: profile } = await supabase.from('users').select('payment_alias').eq('id', user.id).single()
 
+    // Check if user has MP connected
+    const mpClient = await getUserMercadoPagoClient(user.id)
+
     return {
         ...group,
         payment_alias: profile?.payment_alias ?? null,
+        mpConnected: mpClient !== null,
         billingPeriod: getCurrentBillingPeriod(),
     }
 }
@@ -63,19 +68,20 @@ export async function createPaymentLink(member: PaymentLinkMember, group: Paymen
         return { success: false, link: '', error: ownership.error }
     }
 
-    if (!process.env.MERCADOPAGO_ACCESS_TOKEN || process.env.MERCADOPAGO_ACCESS_TOKEN === 'TU_TOKEN_AQUI') {
+    // Get the user's own Mercado Pago client (multi-tenant)
+    const mpClient = await getUserMercadoPagoClient(user.id)
+    if (!mpClient) {
         return {
             success: false,
             link: '',
             mpNotConfigured: true,
-            error: 'Mercado Pago no está configurado.',
+            error: 'Conectá tu cuenta de Mercado Pago en Ajustes para generar links de pago.',
         }
     }
 
     try {
         const billingPeriod = getCurrentBillingPeriod()
-        const client = new MercadoPagoConfig({ accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN })
-        const preference = new Preference(client)
+        const preference = new Preference(mpClient.client)
 
         const netAmount = Number(member.quota_amount)
         const breakdown = calculateMercadoPagoGrossAmount(netAmount, getMercadoPagoFeePercent())
@@ -120,11 +126,9 @@ export async function createPaymentLink(member: PaymentLinkMember, group: Paymen
             },
         })
 
-        const isSandbox = process.env.MERCADOPAGO_USE_SANDBOX === 'true'
-
         return {
             success: true,
-            link: isSandbox ? response.sandbox_init_point! : response.init_point!,
+            link: response.init_point!,
             billingPeriod,
             ...breakdown,
         }

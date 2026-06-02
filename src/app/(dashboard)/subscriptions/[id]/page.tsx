@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { MemberActions } from './MemberActions'
 import { GroupHeaderActions } from './GroupHeaderActions'
 import { Card } from '@/components/ui/Card'
-import { getMercadoPagoFeePercent, isMercadoPagoConfigured } from '@/utils/payment-fees'
+import { getMercadoPagoFeePercent } from '@/utils/payment-fees'
 import { formatBillingPeriodLabel, isPaidForPeriod } from '@/utils/billing-period'
 import type { GroupMember, Payment } from '@/types/database'
 
@@ -29,7 +29,7 @@ export default async function SubscriptionDetails({ params }: { params: Promise<
     const paidCount = members.filter((m) => isPaidForPeriod(payments, m.id, billingPeriod)).length
 
     const mpFeePercent = getMercadoPagoFeePercent()
-    const mpConfigured = isMercadoPagoConfigured()
+    const mpConfigured = group.mpConnected ?? false
 
     return (
         <div className="animate-in fade-in zoom-in-95 duration-500 max-w-5xl mx-auto">
@@ -93,10 +93,9 @@ export default async function SubscriptionDetails({ params }: { params: Promise<
             {!mpConfigured && (
                 <div className="mb-6 p-4 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-100 text-sm">
                     <Link href="/settings" className="font-medium underline hover:text-sky-50">
-                        Configurá Mercado Pago
+                        Conectá tu cuenta de Mercado Pago
                     </Link>{' '}
-                    en Ajustes (variable <code className="text-sky-200">MERCADOPAGO_ACCESS_TOKEN</code> en{' '}
-                    <code className="text-sky-200">.env.local</code>) para incluir el link de pago en WhatsApp.
+                    en Ajustes para incluir el link de pago en WhatsApp.
                 </div>
             )}
 
