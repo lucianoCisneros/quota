@@ -11,10 +11,11 @@ export const config = {
          * Match all request paths except:
          * - _next/static (static files)
          * - _next/image (image optimization files)
+         * - _next/webpack-hmr (WebSocket hot-module-reload — must bypass middleware)
          * - favicon.ico (favicon file)
          * - api/webhooks (Mercado Pago webhooks — auth-agnostic)
          * - Static files (svg, png, jpg, jpeg, gif, webp)
          */
-        '/((?!_next/static|_next/image|favicon.ico|api/webhooks|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+        '/((?!_next/static|_next/image|_next/webpack-hmr|favicon.ico|api/webhooks|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
     ],
 }

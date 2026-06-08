@@ -1,8 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   reactCompiler: true,
+  allowedDevOrigins: ["pushover-lapdog-pentagram.ngrok-free.dev"],
 };
 
 export default nextConfig;
