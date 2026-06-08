@@ -87,7 +87,7 @@ export async function createPaymentLink(member: PaymentLinkMember, group: Paymen
         const breakdown = calculateMercadoPagoGrossAmount(netAmount, getMercadoPagoFeePercent())
         const title = `Cuota de ${group.name} (${billingPeriod})`
         const externalReference = buildExternalReference(group.id, member.id, billingPeriod)
-        const notificationUrl = `${getAppUrl()}/api/webhooks/mercadopago`
+        const notificationUrl = `${await getAppUrl()}/api/webhooks/mercadopago`
 
         const items =
             breakdown.feeAmount > 0

@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
   })
 
   // Build and redirect to MP OAuth URL
-  const mpUrl = buildMpConnectUrl(state)
+  const mpUrl = await buildMpConnectUrl(state)
 
   return NextResponse.redirect(mpUrl)
 }

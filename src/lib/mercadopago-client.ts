@@ -103,7 +103,7 @@ export async function exchangeOAuthCode(code: string): Promise<{
   const clientSecret = process.env.MERCADOPAGO_CLIENT_SECRET
   const redirectUri =
     process.env.NEXT_PUBLIC_MP_CONNECT_REDIRECT_URI ??
-    `${getAppUrl()}/api/mercadopago/callback`
+    `${await getAppUrl()}/api/mercadopago/callback`
 
   if (!clientId || !clientSecret) {
     console.error('[MP OAuth] Faltan MERCADOPAGO_CLIENT_ID o MERCADOPAGO_CLIENT_SECRET')
@@ -319,11 +319,11 @@ export async function disconnectUserMp(userId: string): Promise<boolean> {
 /**
  * Build the Mercado Pago OAuth authorization URL.
  */
-export function buildMpConnectUrl(state: string): string {
+export async function buildMpConnectUrl(state: string): Promise<string> {
   const clientId = process.env.MERCADOPAGO_CLIENT_ID
   const redirectUri =
     process.env.NEXT_PUBLIC_MP_CONNECT_REDIRECT_URI ??
-    `${getAppUrl()}/api/mercadopago/callback`
+    `${await getAppUrl()}/api/mercadopago/callback`
 
   const params = new URLSearchParams({
     client_id: clientId ?? '',

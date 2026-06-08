@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
 import { exchangeOAuthCode, saveUserMpTokens } from '@/lib/mercadopago-client'
 import { cookies } from 'next/headers'
+import { getAppUrl } from '@/utils/app-url'
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
@@ -9,26 +10,21 @@ export async function GET(request: Request) {
   const state = searchParams.get('state')
   const error = searchParams.get('error')
 
+  // Resolve the public-facing base URL once for all redirects.
+  // Using request.url as base can produce an http://localhost URL
+  // when ngrok forwards the request, causing SSL errors on redirect.
+  const baseUrl = await getAppUrl()
+
   // ─── 1. Handle MP auth error ──────────────────────────────
   if (error) {
     console.error('[MP Callback] Auth error from MP:', error)
-    return NextResponse.redirect(
-      new URL(
-        '/settings?mp_error=mp_denied',
-        request.url,
-      ),
-    )
+    return NextResponse.redirect(`${baseUrl}/settings?mp_error=mp_denied`)
   }
 
   // ─── 2. Validate required params ──────────────────────────
   if (!code || !state) {
     console.error('[MP Callback] Missing code or state')
-    return NextResponse.redirect(
-      new URL(
-        '/settings?mp_error=missing_params',
-        request.url,
-      ),
-    )
+    return NextResponse.redirect(`${baseUrl}/settings?mp_error=missing_params`)
   }
 
   // ─── 3. Validate state (CSRF protection) ──────────────────
@@ -37,12 +33,7 @@ export async function GET(request: Request) {
 
   if (!savedState || savedState !== state) {
     console.error('[MP Callback] State mismatch — posible CSRF attack')
-    return NextResponse.redirect(
-      new URL(
-        '/settings?mp_error=csrf',
-        request.url,
-      ),
-    )
+    return NextResponse.redirect(`${baseUrl}/settings?mp_error=csrf`)
   }
 
   // Clear the state cookie
@@ -55,24 +46,14 @@ export async function GET(request: Request) {
   } = await supabase.auth.getUser()
 
   if (!user) {
-    return NextResponse.redirect(
-      new URL(
-        '/login?redirect=/settings',
-        request.url,
-      ),
-    )
+    return NextResponse.redirect(`${baseUrl}/login?redirect=/settings`)
   }
 
   // ─── 5. Exchange code for tokens ──────────────────────────
   const tokenData = await exchangeOAuthCode(code)
 
   if (!tokenData) {
-    return NextResponse.redirect(
-      new URL(
-        '/settings?mp_error=token_exchange_failed',
-        request.url,
-      ),
-    )
+    return NextResponse.redirect(`${baseUrl}/settings?mp_error=token_exchange_failed`)
   }
 
   // ─── 6. Save encrypted tokens to DB ───────────────────────
@@ -85,16 +66,9 @@ export async function GET(request: Request) {
   })
 
   if (!saved) {
-    return NextResponse.redirect(
-      new URL(
-        '/settings?mp_error=save_failed',
-        request.url,
-      ),
-    )
+    return NextResponse.redirect(`${baseUrl}/settings?mp_error=save_failed`)
   }
 
   // ─── 7. Redirect to settings with success ─────────────────
-  return NextResponse.redirect(
-    new URL('/settings?mp_success=1', request.url),
-  )
+  return NextResponse.redirect(`${baseUrl}/settings?mp_success=1`)
 }
