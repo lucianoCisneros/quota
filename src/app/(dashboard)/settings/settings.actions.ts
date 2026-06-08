@@ -17,7 +17,7 @@ export async function getSettingsData() {
 
     const { data: profile } = await supabase
         .from('users')
-        .select('email, name, payment_alias, mp_user_id, mp_connected_at')
+        .select('email, name, last_name, payment_alias, mp_user_id, mp_connected_at')
         .eq('id', user.id)
         .single()
 
@@ -47,6 +47,46 @@ export async function updatePaymentAlias(formData: FormData) {
     const { error } = await supabase.from('users').update({ payment_alias }).eq('id', user.id)
 
     if (error) return { error: error.message }
+
+    revalidatePath('/settings')
+    revalidatePath('/', 'layout')
+    return { success: true }
+}
+
+export async function updateProfile(formData: FormData) {
+    const supabase = await createClient()
+    const {
+        data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) return { error: 'No autorizado' }
+
+    const name = (formData.get('name') as string)?.trim()
+    const lastName = (formData.get('lastName') as string)?.trim() || null
+    const email = (formData.get('email') as string)?.trim()
+
+    if (!name) return { error: 'El nombre es obligatorio' }
+
+    // Validar email
+    if (!email) return { error: 'El email es obligatorio' }
+
+    // Actualizar en public.users
+    const { error } = await supabase
+        .from('users')
+        .update({
+            name,
+            last_name: lastName,
+            email,
+        })
+        .eq('id', user.id)
+
+    if (error) return { error: error.message }
+
+    // Si el email cambió, actualizar también en auth.users
+    if (email !== user.email) {
+        const { error: authError } = await supabase.auth.updateUser({ email })
+        if (authError) return { error: authError.message }
+    }
 
     revalidatePath('/settings')
     revalidatePath('/', 'layout')

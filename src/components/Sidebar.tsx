@@ -4,12 +4,32 @@ import { signOut } from '@/app/auth/auth.actions'
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
-import { LayoutDashboard, CreditCard, Users, Settings, LogOut, Menu, X, Crown } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { LayoutDashboard, CreditCard, Users, Settings, LogOut, Menu, X, Crown, User } from 'lucide-react'
+import { createClient } from '@/utils/supabase/client'
 
 export function Sidebar() {
     const pathname = usePathname()
     const [isOpen, setIsOpen] = useState(false)
+    const [userName, setUserName] = useState<string | null>(null)
+
+    useEffect(() => {
+        const getUser = async () => {
+            const supabase = createClient()
+            const {
+                data: { user },
+            } = await supabase.auth.getUser()
+            if (user) {
+                const { data: profile } = await supabase
+                    .from('users')
+                    .select('name')
+                    .eq('id', user.id)
+                    .single()
+                setUserName(profile?.name || user.email?.split('@')[0] || null)
+            }
+        }
+        getUser()
+    }, [])
 
     const links = [
         { name: 'Inicio', href: '/', icon: LayoutDashboard },
@@ -98,7 +118,22 @@ export function Sidebar() {
                     })}
                 </div>
 
-                <div className="mt-8 space-y-4">
+                {/* User greeting */}
+                {userName && (
+                    <div className="px-4 py-3 mb-2 rounded-xl bg-white/[0.03] border border-white/5">
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shrink-0">
+                                <User size={16} />
+                            </div>
+                            <div className="min-w-0">
+                                <p className="text-sm font-medium text-zinc-200 truncate">{userName}</p>
+                                <p className="text-xs text-zinc-500">Dashboard</p>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                <div className="space-y-4">
                     <Link
                         href="/premium"
                         onClick={() => setIsOpen(false)}

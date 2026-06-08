@@ -50,6 +50,7 @@ export type UserProfile = {
     id: string
     email: string | null
     name: string | null
+    last_name: string | null
     payment_alias: string | null
     tier: 'free' | 'premium'
     /** Encrypted Mercado Pago access token (AES-256-GCM) */
