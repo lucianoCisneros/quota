@@ -146,10 +146,8 @@ export function MpConnectSection({ mpConnected, mpUserId, mpConnectedAt, mpFeePe
             <div className="text-xs text-zinc-500 space-y-1.5">
                 <h4 className="font-medium text-zinc-400">Comisión de Mercado Pago</h4>
                 <p>
-                    Quota estima una comisión del <span className="text-indigo-300 font-medium">{mpFeePercent}%</span> y la
-                    suma al monto que paga tu amigo, para que vos recibas la cuota completa. Podés ajustar el porcentaje
-                    con la variable <code className="text-zinc-300">MERCADOPAGO_FEE_PERCENT</code> en tu archivo de
-                    entorno.
+                    Quota estima una comisión del <span className="text-indigo-300 font-medium">{mpFeePercent}%</span> de MercadoPago y la
+                    suma al monto que paga tu amigo, para que vos recibas la cuota completa.
                 </p>
             </div>
         </div>

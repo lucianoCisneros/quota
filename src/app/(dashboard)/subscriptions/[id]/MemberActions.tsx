@@ -190,7 +190,7 @@ export function MemberActions({ member, group, isPaid, paymentAlias, mpFeePercen
                         Configurá tu alias para cobrar
                     </Link>
                 )}
-                <div className="flex gap-2 justify-end items-center flex-wrap">
+                <div className="flex gap-2 justify-between items-center flex-wrap">
                     <Button
                         onClick={() => setShowEdit(true)}
                         title="Editar participante"
@@ -237,7 +237,7 @@ export function MemberActions({ member, group, isPaid, paymentAlias, mpFeePercen
                         isLoading={isPending}
                         variant="secondary"
                         size="sm"
-                        className={`ml-2 ${isPaid ? 'text-green-400 border-green-500/20 bg-green-500/5' : 'text-white'}`}
+                        className={`w-full ml-2 ${isPaid ? 'text-green-400 border-green-500/20 bg-green-500/5' : 'text-white'}`}
                     >
                         {isPaid ? '✓ Pagado' : 'Marcar Pagado'}
                     </Button>
