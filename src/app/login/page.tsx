@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { login, signup } from './login.actions'
 import { Activity, Eye, EyeOff } from 'lucide-react'
@@ -23,6 +23,16 @@ type FormErrors = {
 }
 
 export default function LoginPage() {
+    return (
+        <Suspense fallback={<div className="flex h-screen items-center justify-center bg-[#0a0a0a] text-zinc-100">
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent" />
+        </div>}>
+            <LoginForm />
+        </Suspense>
+    )
+}
+
+function LoginForm() {
     const searchParams = useSearchParams()
     const message = searchParams.get('message')
     const [tab, setTab] = useState<'login' | 'register'>('login')
@@ -128,6 +138,18 @@ export default function LoginPage() {
                     {message && (
                         <div className="rounded-lg bg-indigo-500/10 p-3 text-center text-sm font-medium text-indigo-400 border border-indigo-500/20">
                             {message}
+                        </div>
+                    )}
+
+                    {/* Forgot password link */}
+                    {tab === 'login' && (
+                        <div className="text-center -mb-2">
+                            <a
+                                href="/login/reset-password"
+                                className="text-sm text-zinc-500 hover:text-indigo-400 transition-colors"
+                            >
+                                ¿Olvidaste tu contraseña?
+                            </a>
                         </div>
                     )}
 
