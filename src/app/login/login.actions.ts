@@ -2,10 +2,55 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 import { createClient } from '@/utils/supabase/server'
+
+// ─── Simple in-memory rate limiter ─────────────────────────
+// Resets when the server restarts. For production with multiple
+// instances, use Upstash Redis or similar.
+const loginAttempts = new Map<string, { count: number; blockedUntil: number }>()
+
+function checkRateLimit(ip: string): { allowed: boolean; message?: string } {
+    const now = Date.now()
+    const record = loginAttempts.get(ip)
+
+    if (record && record.blockedUntil > now) {
+        const remainingSeconds = Math.ceil((record.blockedUntil - now) / 1000)
+        return { allowed: false, message: `Demasiados intentos. Intentá de nuevo en ${remainingSeconds} segundos.` }
+    }
+
+    if (record) {
+        record.count++
+        if (record.count >= 5) {
+            record.blockedUntil = now + 60_000 // Bloquear 1 minuto
+        }
+    } else {
+        loginAttempts.set(ip, { count: 1, blockedUntil: 0 })
+    }
+
+    // Cleanup old entries every 100 attempts
+    if (loginAttempts.size > 100) {
+        const cutoff = now - 5 * 60_000
+        for (const [key, val] of loginAttempts) {
+            if (val.blockedUntil < cutoff && val.count > 0) {
+                loginAttempts.delete(key)
+            }
+        }
+    }
+
+    return { allowed: true }
+}
 
 export async function login(formData: FormData) {
     const supabase = await createClient()
+
+    // Rate limiting por IP
+    const headersList = await headers()
+    const ip = headersList.get('x-forwarded-for') ?? headersList.get('x-real-ip') ?? 'unknown'
+    const { allowed, message } = checkRateLimit(ip)
+    if (!allowed) {
+        redirect(`/login?message=${encodeURIComponent(message!)}`)
+    }
 
     const data = {
         email: formData.get('email') as string,
@@ -15,8 +60,12 @@ export async function login(formData: FormData) {
     const { error } = await supabase.auth.signInWithPassword(data)
 
     if (error) {
-        redirect(`/login?message=${encodeURIComponent(error.message)}`)
+        // Mensaje genérico para prevenir enumeración de cuentas
+        redirect('/login?message=Email+o+contrase%C3%B1a+incorrectos')
     }
+
+    // Resetear intentos en caso de login exitoso
+    loginAttempts.delete(ip)
 
     revalidatePath('/', 'layout')
     redirect('/')
@@ -53,7 +102,8 @@ export async function signup(formData: FormData) {
     const { data, error } = await supabase.auth.signUp({ email, password })
 
     if (error) {
-        redirect(`/login?message=${encodeURIComponent(error.message)}`)
+        // Mensaje genérico para no revelar si el email ya existe
+        redirect('/login?message=No+se+pudo+completar+el+registro.+Revis%C3%A1+los+datos+e+intent%C3%A1+de+nuevo.')
     }
 
     // Update profile in public.users with name and last_name

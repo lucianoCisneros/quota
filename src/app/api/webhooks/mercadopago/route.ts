@@ -16,7 +16,8 @@ export async function POST(request: Request) {
         const isValidSignature = verifyMercadoPagoSignature(rawBody, xSignature, xRequestId)
 
         if (!isValidSignature) {
-            console.warn('[MP Webhook] x-signature inválida o ausente — se omite validación HMAC')
+            console.error('[MP Webhook] x-signature inválida — solicitud rechazada')
+            return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
         }
 
         // ─── 2. Extraer payment ID ─────────────────────────────────────
