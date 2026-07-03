@@ -1,34 +1,28 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { X } from 'lucide-react'
-import { updateMember } from './subscription-detail.actions'
+import { X, UserPlus } from 'lucide-react'
+import { addGroupMember } from './subscription-detail.actions'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 
-type MemberEditDialogProps = {
-    member: {
-        id: string
-        user_name: string
-        whatsapp_number?: string | null
-        email?: string | null
-    }
+type AddMemberDialogProps = {
     groupId: string
     onClose: () => void
 }
 
-export function MemberEditDialog({ member, groupId, onClose }: MemberEditDialogProps) {
+export function AddMemberDialog({ groupId, onClose }: AddMemberDialogProps) {
     const [isPending, startTransition] = useTransition()
     const [error, setError] = useState<string | null>(null)
 
     const handleSubmit = async (formData: FormData) => {
         setError(null)
         startTransition(async () => {
-            const result = await updateMember(member.id, groupId, formData)
+            const result = await addGroupMember(groupId, formData)
             if (result.success) {
                 onClose()
             } else {
-                setError(result.error ?? 'Error al actualizar.')
+                setError(result.error ?? 'Error al agregar.')
             }
         })
     }
@@ -41,7 +35,12 @@ export function MemberEditDialog({ member, groupId, onClose }: MemberEditDialogP
             {/* Modal */}
             <div className="relative w-full max-w-md rounded-[18px] bg-surface-1 border border-border-hairline shadow-[0_12px_32px_rgba(0,0,0,0.5)] p-6 sm:p-8 page-enter">
                 <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-[17px] font-semibold text-text-primary">Editar participante</h3>
+                    <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-[10px] bg-accent/10 flex items-center justify-center">
+                            <UserPlus size={16} className="text-accent" strokeWidth={1.75} />
+                        </div>
+                        <h3 className="text-[17px] font-semibold text-text-primary">Agregar integrante</h3>
+                    </div>
                     <button
                         onClick={onClose}
                         className="text-text-tertiary hover:text-text-primary transition-colors"
@@ -61,7 +60,6 @@ export function MemberEditDialog({ member, groupId, onClose }: MemberEditDialogP
                     <Input
                         label="Nombre"
                         name="user_name"
-                        defaultValue={member.user_name}
                         required
                         placeholder="Nombre del amigo"
                     />
@@ -70,7 +68,6 @@ export function MemberEditDialog({ member, groupId, onClose }: MemberEditDialogP
                         label="WhatsApp"
                         name="whatsapp_number"
                         type="tel"
-                        defaultValue={member.whatsapp_number ?? ''}
                         placeholder="Ej: 5491123456789"
                     />
 
@@ -78,13 +75,16 @@ export function MemberEditDialog({ member, groupId, onClose }: MemberEditDialogP
                         label="Email"
                         name="email"
                         type="email"
-                        defaultValue={member.email ?? ''}
                         placeholder="amigo@email.com (opcional)"
                     />
 
+                    <p className="text-[13px] text-text-tertiary leading-relaxed">
+                        Al agregar un integrante, la cuota se recalcula automáticamente en partes iguales entre todos.
+                    </p>
+
                     <div className="flex gap-3 pt-2">
                         <Button type="submit" isLoading={isPending} className="flex-1">
-                            Guardar cambios
+                            Agregar
                         </Button>
                         <Button
                             type="button"

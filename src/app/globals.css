@@ -1,60 +1,211 @@
 @import "tailwindcss";
+@reference "tailwindcss";
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  
-  --color-primary-50: #eef2ff;
-  --color-primary-100: #e0e7ff;
-  --color-primary-500: #6366f1;
-  --color-primary-600: #4f46e5;
-  --color-primary-700: #4338ca;
-  --color-primary-glow: rgba(99, 102, 241, 0.5);
-  
-  --color-surface: var(--surface);
-  --color-surface-hover: var(--surface-hover);
-  --color-border-light: var(--border-light);
-  
-  --animate-float: float 6s ease-in-out infinite;
-  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    /* ── Surfaces (macOS Sonoma dark mode layered) ── */
+    --color-bg-base: var(--bg-base);
+    --color-surface-1: var(--surface-1);
+    --color-surface-2: var(--surface-2);
+    --color-surface-3: var(--surface-3);
+
+    /* ── Text (Apple label hierarchy) ── */
+    --color-text-primary: var(--text-primary);
+    --color-text-secondary: var(--text-secondary);
+    --color-text-tertiary: var(--text-tertiary);
+
+    /* ── Accent: Apple Blue ── */
+    --color-accent: var(--accent);
+    --color-accent-hover: var(--accent-hover);
+    --color-accent-subtle: var(--accent-subtle);
+
+    /* ── Semantic colors (discreet, text-level only) ── */
+    --color-success: var(--success);
+    --color-warning: var(--warning);
+    --color-danger: var(--danger);
+
+    /* ── Borders ── */
+    --color-border-hairline: var(--border-hairline);
+    --color-border-hairline-strong: var(--border-hairline-strong);
+
+    /* ── Radii ── */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+    --radius-xl: 24px;
+
+    /* ── Animations (kept minimal) ── */
+    --animate-fade-in: fade-in 0.3s ease-out;
+    --animate-slide-up: slide-up 0.3s ease-out;
 }
 
+@keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@keyframes slide-up {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Dark mode (default) ── */
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
-  --surface: #ffffff;
-  --surface-hover: #f1f5f9;
-  --border-light: #e2e8f0;
+    --bg-base: #121214;
+    --surface-1: #1c1c1e;
+    --surface-2: #2c2c2e;
+    --surface-3: #3a3a3c;
+
+    --text-primary: #f5f5f7;
+    --text-secondary: #98989d;
+    --text-tertiary: #636366;
+
+    --accent: #0a84ff;
+    --accent-hover: #3aa0ff;
+    --accent-subtle: rgba(10, 132, 255, 0.12);
+
+    --success: #30d158;
+    --warning: #ff9f0a;
+    --danger: #ff453a;
+
+    --border-hairline: rgba(255, 255, 255, 0.08);
+    --border-hairline-strong: rgba(255, 255, 255, 0.14);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #09090b;
-    --foreground: #f8fafc;
-    --surface: #18181b;
-    --surface-hover: #27272a;
-    --border-light: #27272a;
-  }
+/* ── Light mode (elegant fallback) ── */
+@media (prefers-color-scheme: light) {
+    :root {
+        --bg-base: #f5f5f7;
+        --surface-1: #ffffff;
+        --surface-2: #f0f0f2;
+        --surface-3: #e5e5e7;
+
+        --text-primary: #1d1d1f;
+        --text-secondary: #6e6e73;
+        --text-tertiary: #86868b;
+
+        --accent: #0071e3;
+        --accent-hover: #0077ed;
+        --accent-subtle: rgba(0, 113, 227, 0.08);
+
+        --success: #248a3d;
+        --warning: #b86200;
+        --danger: #bf3a2b;
+
+        --border-hairline: rgba(0, 0, 0, 0.08);
+        --border-hairline-strong: rgba(0, 0, 0, 0.14);
+    }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-  @apply antialiased transition-colors duration-300;
+    background: var(--bg-base);
+    color: var(--text-primary);
+    font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    @apply antialiased;
 }
 
-.glass {
-  @apply bg-surface/80 backdrop-blur-md border border-border-light shadow-sm;
+button:not(:disabled) {
+    cursor: pointer;
 }
 
-@keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
+/* ── Utility classes ── */
+
+/* Hairline border (top or bottom divider, no full border on cards) */
+.hairline-bottom {
+    border-bottom: 1px solid var(--border-hairline);
+}
+.hairline-top {
+    border-top: 1px solid var(--border-hairline);
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: .5; }
+/* Elevated card style — subtle lift via shadow, no border color */
+.card-elevated {
+    background: var(--surface-1);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    transition: background 0.2s ease-out, border-color 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+.card-elevated:hover {
+    background: var(--surface-2);
+    border-color: var(--border-hairline-strong);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+/* Flat card — no shadow, just surface + hairline */
+.card-flat {
+    background: var(--surface-1);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-lg);
+    transition: background 0.2s ease-out, border-color 0.2s ease-out;
+}
+.card-flat:hover {
+    background: var(--surface-2);
+    border-color: var(--border-hairline-strong);
+}
+
+/* Inset card — sits on surface-2 to feel embedded */
+.card-inset {
+    background: var(--surface-2);
+    border: 1px solid transparent;
+    border-radius: var(--radius-lg);
+    transition: background 0.2s ease-out;
+}
+.card-inset:hover {
+    background: var(--surface-3);
+}
+
+/* Apple-style list row (like Settings.app) */
+.list-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    background: transparent;
+    transition: background 0.15s ease-out;
+    cursor: pointer;
+}
+.list-row:hover {
+    background: var(--surface-2);
+}
+.list-row + .list-row {
+    border-top: 1px solid var(--border-hairline);
+}
+
+/* Segmented control */
+.segmented-control {
+    display: inline-flex;
+    background: var(--surface-2);
+    border-radius: 10px;
+    padding: 3px;
+    gap: 2px;
+}
+.segmented-control button {
+    padding: 6px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    transition: background 0.2s ease-out, color 0.2s ease-out;
+    background: transparent;
+}
+.segmented-control button.active {
+    background: var(--surface-3);
+    color: var(--text-primary);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+.segmented-control button:not(.active):hover {
+    color: var(--text-primary);
+}
+
+/* Focus ring (accesibility) — reusable */
+.focus-ring {
+    outline: none;
+}
+.focus-ring:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* Fade/slide animation for page entry */
+.page-enter {
+    animation: slide-up 0.3s ease-out;
 }

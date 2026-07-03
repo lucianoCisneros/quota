@@ -23,7 +23,6 @@ export function MpConnectSection({ mpConnected, mpUserId, mpConnectedAt, mpFeePe
     const success = searchParams.get('mp_success')
 
     const handleConnect = () => {
-        // Clear any error params before redirecting
         router.replace('/settings')
         window.location.href = '/api/mercadopago/connect'
     }
@@ -64,17 +63,17 @@ export function MpConnectSection({ mpConnected, mpUserId, mpConnectedAt, mpFeePe
     }
 
     return (
-        <div className="p-6 mt-6 border border-white/5 rounded-xl bg-white/[0.02]">
+        <div className="p-6 mt-6 rounded-[18px] border border-border-hairline bg-surface-1">
             {errorCode && errorMessages[errorCode] && (
-                <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-300 text-sm flex items-center gap-2">
-                    <XCircle size={16} className="shrink-0" />
+                <div className="mb-4 p-3 rounded-[10px] bg-surface-2 text-danger text-[13px] flex items-center gap-2">
+                    <XCircle size={15} strokeWidth={1.75} className="shrink-0" />
                     <span>{errorMessages[errorCode]}</span>
                 </div>
             )}
 
             {success && (
-                <div className="mb-4 p-3 rounded-lg bg-green-500/10 border border-green-500/20 text-green-300 text-sm flex items-center gap-2">
-                    <CheckCircle size={16} className="shrink-0" />
+                <div className="mb-4 p-3 rounded-[10px] bg-surface-2 text-success text-[13px] flex items-center gap-2">
+                    <CheckCircle size={15} strokeWidth={1.75} className="shrink-0" />
                     <span>¡Cuenta de Mercado Pago conectada exitosamente!</span>
                 </div>
             )}
@@ -82,8 +81,8 @@ export function MpConnectSection({ mpConnected, mpUserId, mpConnectedAt, mpFeePe
             <div className="flex flex-col gap-3">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h3 className="font-medium text-white">Cobrar con Mercado Pago</h3>
-                        <p className="text-sm text-zinc-400 mt-1">
+                        <h3 className="text-[17px] font-semibold text-text-primary">Cobrar con Mercado Pago</h3>
+                        <p className="text-[13px] text-text-secondary mt-1">
                             {mpConnected
                                 ? 'Tu cuenta de Mercado Pago está conectada. Los links de pago usan tu cuenta para recibir el dinero.'
                                 : 'Conectá tu cuenta de Mercado Pago para que los pagos vayan directo a vos.'}
@@ -92,18 +91,18 @@ export function MpConnectSection({ mpConnected, mpUserId, mpConnectedAt, mpFeePe
                 </div>
 
                 {mpConnected ? (
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-2 p-3 rounded-lg bg-green-500/5 border border-green-500/10">
-                        <div className="flex items-center gap-2 text-sm text-green-300">
-                            <CheckCircle size={18} className="shrink-0" />
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-2 p-4 rounded-[12px] bg-surface-2">
+                        <div className="flex items-center gap-2 text-[13px] text-success">
+                            <CheckCircle size={18} strokeWidth={1.75} className="shrink-0" />
                             <div>
                                 <span className="font-medium">Conectado</span>
                                 {mpConnectedAt && (
-                                    <span className="text-zinc-400 ml-1">
+                                    <span className="text-text-tertiary ml-1">
                                         desde {formatDate(mpConnectedAt)}
                                     </span>
                                 )}
                                 {mpUserId && (
-                                    <span className="text-zinc-500 block text-xs mt-0.5">
+                                    <span className="text-text-tertiary block text-[12px] mt-0.5">
                                         ID de cuenta MP: {mpUserId}
                                     </span>
                                 )}
@@ -112,9 +111,9 @@ export function MpConnectSection({ mpConnected, mpUserId, mpConnectedAt, mpFeePe
                         <Button
                             onClick={handleDisconnect}
                             isLoading={disconnecting}
-                            variant="ghost"
+                            variant="danger"
                             size="sm"
-                            className="text-red-400 hover:text-red-300 hover:bg-red-500/10 self-start sm:self-center"
+                            className="self-start sm:self-center"
                         >
                             Desconectar
                         </Button>
@@ -127,9 +126,9 @@ export function MpConnectSection({ mpConnected, mpUserId, mpConnectedAt, mpFeePe
                             className="w-full sm:w-auto inline-flex items-center gap-2"
                         >
                             Conectar Mercado Pago
-                            <ExternalLink size={16} />
+                            <ExternalLink size={16} strokeWidth={1.75} />
                         </Button>
-                        <p className="text-xs text-zinc-500 leading-relaxed">
+                        <p className="text-[13px] text-text-tertiary leading-relaxed">
                             Vas a ser redirigido a Mercado Pago para autorizar la conexión.
                             Solo necesitás iniciar sesión con tu cuenta de Mercado Pago y aceptar los permisos.
                         </p>
@@ -137,16 +136,16 @@ export function MpConnectSection({ mpConnected, mpUserId, mpConnectedAt, mpFeePe
                 )}
 
                 {disconnectError && (
-                    <p className="text-xs text-red-400 mt-1">{disconnectError}</p>
+                    <p className="text-[13px] text-danger mt-1">{disconnectError}</p>
                 )}
             </div>
 
-            <hr className="my-4 border-white/5" />
+            <div className="hairline-top my-5" />
 
-            <div className="text-xs text-zinc-500 space-y-1.5">
-                <h4 className="font-medium text-zinc-400">Comisión de Mercado Pago</h4>
+            <div className="text-[13px] text-text-tertiary space-y-1.5">
+                <h4 className="font-medium text-text-secondary">Comisión de Mercado Pago</h4>
                 <p>
-                    Quota estima una comisión del <span className="text-indigo-300 font-medium">{mpFeePercent}%</span> de MercadoPago y la
+                    Quota estima una comisión del <span className="text-accent font-medium">{mpFeePercent}%</span> de MercadoPago y la
                     suma al monto que paga tu amigo, para que vos recibas la cuota completa.
                 </p>
             </div>

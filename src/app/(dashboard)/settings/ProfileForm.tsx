@@ -41,8 +41,8 @@ export function ProfileForm({ initialName, initialLastName, initialEmail }: Prof
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-                <h2 className="text-lg font-medium text-white mb-1">Tu Perfil</h2>
-                <p className="text-sm text-zinc-400 mb-4">
+                <h2 className="text-[17px] font-semibold text-text-primary mb-1">Tu Perfil</h2>
+                <p className="text-[13px] text-text-secondary mb-5">
                     Actualizá tus datos personales. El nombre se muestra en tu dashboard.
                 </p>
 
@@ -77,10 +77,10 @@ export function ProfileForm({ initialName, initialLastName, initialEmail }: Prof
 
             {message && (
                 <div
-                    className={`p-4 rounded-xl text-sm font-medium border ${
+                    className={`p-4 rounded-[12px] text-[13px] font-medium ${
                         message.type === 'ok'
-                            ? 'bg-green-500/10 border-green-500/20 text-green-400'
-                            : 'bg-red-500/10 border-red-500/20 text-red-500'
+                            ? 'bg-surface-2 text-success'
+                            : 'bg-surface-2 text-danger'
                     }`}
                 >
                     {message.text}

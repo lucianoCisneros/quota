@@ -43,40 +43,40 @@ export function SendRemindersButton() {
                 onClick={handleSend}
                 disabled={loading}
                 variant="secondary"
-                className="text-sm gap-2"
+                className="text-[13px] gap-2"
             >
                 {loading ? (
-                    <Loader2 size={16} className="animate-spin" />
+                    <Loader2 size={15} strokeWidth={1.75} className="animate-spin" />
                 ) : (
-                    <Mail size={16} />
+                    <Mail size={15} strokeWidth={1.75} />
                 )}
                 {loading ? 'Enviando...' : 'Enviar recordatorios ahora'}
             </Button>
 
             {result && (
-                <div className="text-xs text-zinc-400 bg-white/5 rounded-lg p-3 space-y-1 border border-white/10">
-                    <p className="flex items-center gap-1.5 text-green-400">
-                        <CheckCircle size={12} />
+                <div className="text-[13px] text-text-secondary bg-surface-2 rounded-[12px] p-3 space-y-1 border border-border-hairline">
+                    <p className="flex items-center gap-1.5 text-success">
+                        <CheckCircle size={12} strokeWidth={2} />
                         <span>{result.sent} recordatorios enviados</span>
                     </p>
                     {result.skippedPaid > 0 && (
-                        <p className="text-zinc-500">
+                        <p className="text-text-tertiary">
                             {result.skippedPaid} ya habían pagado
                         </p>
                     )}
                     {result.skippedNoEmail > 0 && (
-                        <p className="text-zinc-500">
+                        <p className="text-text-tertiary">
                             {result.skippedNoEmail} sin email registrado
                         </p>
                     )}
                     {result.skippedNoAlias > 0 && (
-                        <p className="text-zinc-500">
+                        <p className="text-text-tertiary">
                             {result.skippedNoAlias} grupos sin alias configurado
                         </p>
                     )}
                     {result.errors > 0 && (
-                        <p className="flex items-center gap-1.5 text-red-400">
-                            <XCircle size={12} />
+                        <p className="flex items-center gap-1.5 text-danger">
+                            <XCircle size={12} strokeWidth={2} />
                             <span>{result.errors} errores al enviar</span>
                         </p>
                     )}
@@ -84,7 +84,7 @@ export function SendRemindersButton() {
             )}
 
             {error && (
-                <p className="text-xs text-red-400 bg-red-500/10 rounded-lg p-3 border border-red-500/20">
+                <p className="text-[13px] text-danger bg-surface-2 rounded-[12px] p-3 border border-border-hairline">
                     {error}
                 </p>
             )}

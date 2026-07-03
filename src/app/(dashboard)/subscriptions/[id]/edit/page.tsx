@@ -18,25 +18,25 @@ export default async function EditSubscriptionPage({
     const updateGroup = updateSubscriptionGroup.bind(null, id)
 
     return (
-        <div className="animate-in fade-in zoom-in-95 duration-500 max-w-2xl mx-auto">
+        <div className="page-enter max-w-2xl mx-auto">
             <Link
                 href={`/subscriptions/${id}`}
-                className="inline-flex items-center gap-2 text-zinc-400 hover:text-white transition-colors mb-8 group"
+                className="inline-flex items-center gap-2 text-[15px] text-text-secondary hover:text-text-primary transition-colors mb-8 group"
             >
                 <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
                 <span>Volver al grupo</span>
             </Link>
 
             <header className="mb-10">
-                <h1 className="text-3xl font-bold tracking-tight mb-2">Editar grupo</h1>
-                <p className="text-zinc-400">
+                <h1 className="text-[34px] font-bold tracking-tight text-text-primary mb-1.5">Editar grupo</h1>
+                <p className="text-[15px] text-text-secondary">
                     Los cambios en el precio recalculan la cuota de cada amigo automáticamente.
                 </p>
             </header>
 
-            <Card className="p-6 sm:p-8" variant="glass">
+            <Card variant="flat" className="p-6 sm:p-8">
                 {error && (
-                    <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+                    <div className="mb-6 p-4 rounded-[12px] bg-surface-2 text-danger text-[13px]">
                         {decodeURIComponent(error)}
                     </div>
                 )}

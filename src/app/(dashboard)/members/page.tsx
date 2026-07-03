@@ -8,20 +8,20 @@ export default async function MembersPage() {
     const periodLabel = formatBillingPeriodLabel(billingPeriod)
 
     return (
-        <div className="animate-in fade-in zoom-in-95 duration-500 max-w-5xl mx-auto">
+        <div className="page-enter max-w-5xl mx-auto">
             <header className="mb-10">
-                <h1 className="text-3xl font-bold tracking-tight mb-2">Miembros</h1>
-                <p className="text-zinc-400">
-                    Todos tus amigos en un solo lugar · período de cobro:{' '}
-                    <span className="text-white font-medium">{periodLabel}</span>
+                <h1 className="text-[34px] font-bold tracking-tight text-text-primary mb-1.5">Miembros</h1>
+                <p className="text-[15px] text-text-secondary">
+                    Todos tus amigos en un solo lugar &middot; período de cobro:{' '}
+                    <span className="text-text-primary font-medium">{periodLabel}</span>
                 </p>
             </header>
 
-            <Card className="shadow-xl overflow-hidden" variant="default">
+            <Card variant="elevated" className="overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse min-w-[640px]">
                         <thead>
-                            <tr className="border-b border-white/10 bg-black/20 text-sm text-zinc-400">
+                            <tr className="hairline-bottom text-[13px] text-text-tertiary">
                                 <th className="py-4 px-6 font-medium">Nombre</th>
                                 <th className="py-4 px-6 font-medium">Grupo</th>
                                 <th className="py-4 px-6 font-medium">Cuota</th>
@@ -32,27 +32,24 @@ export default async function MembersPage() {
                         <tbody>
                             {members.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="py-10 text-center text-zinc-500 italic">
+                                    <td colSpan={5} className="py-10 text-center text-[15px] text-text-tertiary">
                                         No tenés miembros. Creá un grupo y agregá amigos.
                                     </td>
                                 </tr>
                             ) : (
                                 members.map((m) => (
-                                    <tr
-                                        key={m.id}
-                                        className="border-b border-white/5 hover:bg-white/5 transition-colors"
-                                    >
-                                        <td className="py-4 px-6 font-medium text-white">{m.user_name}</td>
-                                        <td className="py-4 px-6 text-zinc-300">{m.group.name}</td>
-                                        <td className="py-4 px-6 text-indigo-300 font-medium">
+                                    <tr key={m.id} className="hairline-bottom hover:bg-surface-2 transition-colors">
+                                        <td className="py-4 px-6 text-[15px] font-medium text-text-primary">{m.user_name}</td>
+                                        <td className="py-4 px-6 text-[15px] text-text-secondary">{m.group.name}</td>
+                                        <td className="py-4 px-6 text-[15px] font-medium tabular-nums text-accent">
                                             ${Number(m.quota_amount).toFixed(2)}
                                         </td>
                                         <td className="py-4 px-6">
                                             <span
-                                                className={`text-sm font-medium px-2.5 py-1 rounded-lg ${
+                                                className={`text-[12px] font-medium px-2.5 py-1 rounded-[8px] ${
                                                     m.isPaid
-                                                        ? 'bg-green-500/10 text-green-400 border border-green-500/20'
-                                                        : 'bg-orange-500/10 text-orange-400 border border-orange-500/20'
+                                                        ? 'bg-surface-2 text-success'
+                                                        : 'bg-surface-2 text-warning'
                                                 }`}
                                             >
                                                 {m.isPaid ? 'Pagado' : 'Pendiente'}
@@ -61,9 +58,9 @@ export default async function MembersPage() {
                                         <td className="py-4 px-6 text-right">
                                             <Link
                                                 href={`/subscriptions/${m.group.id}`}
-                                                className="text-sm text-indigo-400 hover:text-indigo-300"
+                                                className="text-[15px] text-accent hover:text-accent-hover"
                                             >
-                                                Ver grupo →
+                                                Ver grupo &rarr;
                                             </Link>
                                         </td>
                                     </tr>

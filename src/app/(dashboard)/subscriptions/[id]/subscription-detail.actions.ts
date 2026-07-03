@@ -260,6 +260,65 @@ export async function updateMember(memberId: string, groupId: string, formData: 
     return { success: true }
 }
 
+export async function addGroupMember(groupId: string, formData: FormData) {
+    const supabase = await createClient()
+    const {
+        data: { user },
+    } = await supabase.auth.getUser()
+    if (!user) return { success: false, error: 'No autorizado.' }
+
+    const ownership = await assertGroupOwner(supabase, user.id, groupId)
+    if (!ownership.ok) return { success: false, error: ownership.error }
+
+    const user_name = (formData.get('user_name') as string)?.trim()
+    const whatsapp_number = (formData.get('whatsapp_number') as string)?.trim() || null
+    const email = (formData.get('email') as string)?.trim() || null
+
+    if (!user_name) {
+        return { success: false, error: 'El nombre es obligatorio.' }
+    }
+
+    // Fetch current group total_price and member count
+    const { data: group } = await supabase
+        .from('groups')
+        .select('total_price')
+        .eq('id', groupId)
+        .single()
+
+    if (!group) return { success: false, error: 'Grupo no encontrado.' }
+
+    const { count: currentCount } = await supabase
+        .from('group_members')
+        .select('*', { count: 'exact', head: true })
+        .eq('group_id', groupId)
+
+    const memberCount = currentCount ?? 0
+    const newQuota = Number(group.total_price) / (memberCount + 1 + 1) // +1 creator, +1 new member
+
+    // Insert the new member
+    const { error: insertError } = await supabase.from('group_members').insert({
+        group_id: groupId,
+        user_name,
+        whatsapp_number,
+        email,
+        quota_amount: newQuota,
+    })
+
+    if (insertError) {
+        return { success: false, error: insertError.message }
+    }
+
+    // Update quota for all existing members
+    if (memberCount > 0) {
+        await supabase.from('group_members').update({ quota_amount: newQuota }).eq('group_id', groupId)
+    }
+
+    revalidatePath(`/subscriptions/${groupId}`)
+    revalidatePath('/')
+    revalidatePath('/members')
+    return { success: true }
+}
+
 export async function deleteSubscriptionGroup(groupId: string) {
     const supabase = await createClient()
     const {

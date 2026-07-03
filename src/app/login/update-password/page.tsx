@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Activity, Eye, EyeOff } from 'lucide-react'
+import { CreditCard, Eye, EyeOff } from 'lucide-react'
+import { Button } from '@/components/ui/Button'
 import { updatePassword } from './update-password.actions'
 
 function validatePassword(password: string): string | null {
@@ -63,14 +64,14 @@ export default function UpdatePasswordPage() {
 
     if (success) {
         return (
-            <div className="flex h-screen flex-col items-center justify-center bg-[#0a0a0a] bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))] text-zinc-100">
-                <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[400px]">
-                    <div className="flex flex-col space-y-2 text-center">
-                        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-green-500/10 mb-4 shadow-[0_0_20px_rgba(34,197,94,0.2)] border border-green-500/20">
-                            <Activity className="h-6 w-6 text-green-400" />
+            <div className="flex min-h-screen flex-col items-center justify-center bg-bg-base px-4">
+                <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[420px]">
+                    <div className="flex flex-col space-y-3 text-center">
+                        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-[14px] bg-success/10">
+                            <CreditCard className="h-6 w-6 text-success" strokeWidth={2} />
                         </div>
-                        <h1 className="text-3xl font-semibold tracking-tight">Contraseña actualizada</h1>
-                        <p className="text-sm text-zinc-400">
+                        <h1 className="text-[28px] font-bold tracking-tight text-text-primary">Contraseña actualizada</h1>
+                        <p className="text-[15px] text-text-secondary">
                             Tu contraseña se actualizó correctamente. Serás redirigido al inicio de sesión...
                         </p>
                     </div>
@@ -80,27 +81,27 @@ export default function UpdatePasswordPage() {
     }
 
     return (
-        <div className="flex h-screen flex-col items-center justify-center bg-[#0a0a0a] bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))] text-zinc-100">
-            <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[400px]">
-                <div className="flex flex-col space-y-2 text-center">
-                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-500/10 mb-4 shadow-[0_0_20px_rgba(99,102,241,0.2)] border border-indigo-500/20">
-                        <Activity className="h-6 w-6 text-indigo-400" />
+        <div className="flex min-h-screen flex-col items-center justify-center bg-bg-base px-4">
+            <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[420px]">
+                <div className="flex flex-col space-y-3 text-center">
+                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-[14px] bg-accent">
+                        <CreditCard className="h-6 w-6 text-white" strokeWidth={2} />
                     </div>
-                    <h1 className="text-3xl font-semibold tracking-tight">Nueva contraseña</h1>
-                    <p className="text-sm text-zinc-400">Ingresá tu nueva contraseña para restablecer el acceso</p>
+                    <h1 className="text-[28px] font-bold tracking-tight text-text-primary">Nueva contraseña</h1>
+                    <p className="text-[15px] text-text-secondary">Ingresá tu nueva contraseña para restablecer el acceso</p>
                 </div>
 
-                <div className="grid mx-4 gap-6 rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-lg">
+                <div className="rounded-[18px] border border-border-hairline bg-surface-1 p-8 shadow-[0_8px_24px_rgba(0,0,0,0.45)]">
                     {error && (
-                        <div className="rounded-lg bg-red-500/10 p-3 text-center text-sm font-medium text-red-400 border border-red-500/20">
+                        <div className="mb-5 p-3 rounded-[10px] bg-surface-2 text-danger text-[13px] text-center">
                             {error}
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                        <div className="grid gap-2">
-                            <label className="text-sm font-medium leading-none text-zinc-300" htmlFor="new-password">
-                                Nueva Contraseña <span className="text-indigo-400">*</span>
+                    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+                        <div>
+                            <label className="block text-[13px] font-medium text-text-secondary mb-1.5" htmlFor="new-password">
+                                Nueva Contraseña <span className="text-accent">*</span>
                             </label>
                             <div className="relative">
                                 <input
@@ -112,23 +113,23 @@ export default function UpdatePasswordPage() {
                                     autoComplete="new-password"
                                     placeholder="Mín. 8 caracteres, 1 mayúscula, 1 minúscula, 1 número"
                                     required
-                                    className="flex h-10 w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all duration-300 pr-10"
+                                    className="w-full bg-surface-2 text-text-primary placeholder:text-text-tertiary border border-border-hairline rounded-[12px] px-4 py-2.5 pr-10 text-[15px] transition-all duration-150 ease-out focus-visible:outline-none focus-visible:border-accent focus-visible:ring-1 focus-visible:ring-accent"
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-text-primary transition-colors"
                                     tabIndex={-1}
                                     aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                                 >
-                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    {showPassword ? <EyeOff size={18} strokeWidth={1.75} /> : <Eye size={18} strokeWidth={1.75} />}
                                 </button>
                             </div>
                         </div>
 
-                        <div className="grid gap-2">
-                            <label className="text-sm font-medium leading-none text-zinc-300" htmlFor="confirm-password">
-                                Repetir Contraseña <span className="text-indigo-400">*</span>
+                        <div>
+                            <label className="block text-[13px] font-medium text-text-secondary mb-1.5" htmlFor="confirm-password">
+                                Repetir Contraseña <span className="text-accent">*</span>
                             </label>
                             <div className="relative">
                                 <input
@@ -140,39 +141,23 @@ export default function UpdatePasswordPage() {
                                     autoComplete="new-password"
                                     placeholder="Repetí la contraseña"
                                     required
-                                    className="flex h-10 w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all duration-300 pr-10"
+                                    className="w-full bg-surface-2 text-text-primary placeholder:text-text-tertiary border border-border-hairline rounded-[12px] px-4 py-2.5 pr-10 text-[15px] transition-all duration-150 ease-out focus-visible:outline-none focus-visible:border-accent focus-visible:ring-1 focus-visible:ring-accent"
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-text-primary transition-colors"
                                     tabIndex={-1}
                                     aria-label={showConfirmPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                                 >
-                                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    {showConfirmPassword ? <EyeOff size={18} strokeWidth={1.75} /> : <Eye size={18} strokeWidth={1.75} />}
                                 </button>
                             </div>
                         </div>
 
-                        <div className="mt-2">
-                            <button
-                                type="submit"
-                                disabled={isLoading}
-                                className="w-full inline-flex h-10 items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-indigo-700 hover:shadow-[0_0_15px_rgba(79,70,229,0.5)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition-all duration-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a] disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                {isLoading ? (
-                                    <span className="flex items-center gap-2">
-                                        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                                        </svg>
-                                        Actualizando...
-                                    </span>
-                                ) : (
-                                    'Actualizar Contraseña'
-                                )}
-                            </button>
-                        </div>
+                        <Button type="submit" isLoading={isLoading} className="w-full mt-1">
+                            Actualizar Contraseña
+                        </Button>
                     </form>
                 </div>
             </div>

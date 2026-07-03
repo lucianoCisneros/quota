@@ -35,8 +35,7 @@ function buildPaymentMessage(params: {
     paymentAlias: string
     mpLink?: string | null
 }): string {
-    const { memberName, groupName, periodLabel, netAmount, grossAmount, feeAmount, feePercent, paymentAlias, mpLink } =
-        params
+    const { memberName, groupName, periodLabel, netAmount, grossAmount, feeAmount, feePercent, paymentAlias, mpLink } = params
 
     const transferSection =
         `1) TRANSFERENCIA (sin comisión)\n` +
@@ -185,59 +184,59 @@ export function MemberActions({ member, group, isPaid, paymentAlias, mpFeePercen
                 {!isPaid && !paymentAlias && (
                     <Link
                         href="/settings"
-                        className="text-xs text-amber-400/90 hover:text-amber-300 underline-offset-2 hover:underline"
+                        className="text-[12px] text-warning hover:text-warning/80"
                     >
                         Configurá tu alias para cobrar
                     </Link>
                 )}
-                <div className="flex gap-2 justify-between items-center flex-wrap">
+                <div className="flex gap-1.5 items-center flex-wrap justify-end">
                     <Button
                         onClick={() => setShowEdit(true)}
-                        title="Editar participante"
                         variant="ghost"
-                        className="text-zinc-400 hover:text-white"
+                        size="sm"
+                        className="text-text-tertiary hover:text-text-primary"
                     >
-                        <Pencil size={16} />
+                        <Pencil size={15} strokeWidth={1.75} />
                     </Button>
                     {!isPaid && (
                         <>
                             <Button
                                 onClick={handleWhatsApp}
-                                title="Enviar opciones de pago por WhatsApp"
                                 disabled={loading || isPending || !paymentAlias}
                                 variant="ghost"
-                                className="text-green-500 hover:text-green-400 disabled:opacity-40"
+                                size="sm"
+                                className="text-success hover:text-success"
                             >
-                                <MessageCircle size={18} />
+                                <MessageCircle size={16} strokeWidth={1.75} />
                             </Button>
                             {member.email && (
                                 <Button
                                     onClick={handleEmail}
-                                    title="Enviar opciones de pago por email"
                                     disabled={emailLoading || isPending || !paymentAlias}
                                     variant="ghost"
-                                    className="text-blue-400 hover:text-blue-300 disabled:opacity-40"
+                                    size="sm"
+                                    className="text-accent hover:text-accent-hover"
                                 >
-                                    {emailSent ? <Check size={18} className="text-green-400" /> : <Mail size={18} />}
+                                    {emailSent ? <Check size={16} strokeWidth={1.75} className="text-success" /> : <Mail size={16} strokeWidth={1.75} />}
                                 </Button>
                             )}
                             <Button
                                 onClick={copyPaymentMessage}
-                                title="Copiar mensaje de cobro"
                                 disabled={loading || isPending || !paymentAlias}
                                 variant="ghost"
-                                className="text-indigo-400 hover:text-indigo-300 disabled:opacity-40"
+                                size="sm"
+                                className="text-text-secondary hover:text-text-primary"
                             >
-                                {linkCopied ? <Check size={18} className="text-green-400" /> : <LinkIcon size={18} />}
+                                {linkCopied ? <Check size={16} strokeWidth={1.75} className="text-success" /> : <LinkIcon size={16} strokeWidth={1.75} />}
                             </Button>
                         </>
                     )}
                     <Button
                         onClick={handleTogglePayment}
                         isLoading={isPending}
-                        variant="secondary"
+                        variant={isPaid ? 'secondary' : 'primary'}
                         size="sm"
-                        className={`w-full ml-2 ${isPaid ? 'text-green-400 border-green-500/20 bg-green-500/5' : 'text-white'}`}
+                        className={`ml-1 ${isPaid ? 'text-success' : ''}`}
                     >
                         {isPaid ? '✓ Pagado' : 'Marcar Pagado'}
                     </Button>

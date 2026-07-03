@@ -39,7 +39,6 @@ export default function NewSubscription() {
         setMembers(members.map((m) => (m.id === id ? { ...m, [field]: value } : m)))
     }
 
-    // Calculate dynamic quota including the creator
     const numberOfPeople = members.filter((m) => m.name.trim() !== '').length + 1
     const quotaPerPerson = parseFloat(totalPrice || '0') / numberOfPeople
 
@@ -55,33 +54,33 @@ export default function NewSubscription() {
     }
 
     return (
-        <div className="animate-in fade-in zoom-in-95 duration-500 max-w-5xl mx-auto">
+        <div className="page-enter max-w-5xl mx-auto">
             <Link
                 href="/"
-                className="inline-flex items-center gap-2 text-zinc-400 hover:text-white transition-colors mb-8 group"
+                className="inline-flex items-center gap-2 text-[15px] text-text-secondary hover:text-text-primary transition-colors mb-8 group"
             >
                 <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
                 <span>Volver al Dashboard</span>
             </Link>
 
             <header className="mb-10">
-                <h1 className="text-3xl font-bold tracking-tight mb-2">Nuevo Grupo de Suscripción</h1>
-                <p className="text-zinc-400">Configura el servicio y añade a los amigos que van a pagar contigo.</p>
+                <h1 className="text-[34px] font-bold tracking-tight text-text-primary mb-1.5">Nuevo Grupo de Suscripción</h1>
+                <p className="text-[15px] text-text-secondary">Configura el servicio y añade a los amigos que van a pagar contigo.</p>
             </header>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2 space-y-8 order-2 lg:order-1">
-                    <Card className="p-4 sm:p-8" variant="glass">
+                    <Card variant="flat" className="p-6 sm:p-8 hover:!bg-surface-1">
                         <form action={handleSubmit}>
                             {error && (
-                                <div className="mb-6 bg-red-500/10 border border-red-500/20 text-red-500 p-4 rounded-xl text-sm font-medium">
+                                <div className="mb-6 p-4 rounded-[12px] bg-surface-2 text-danger text-[13px] font-medium">
                                     {error}
                                 </div>
                             )}
 
                             <div className="space-y-8">
                                 {/* Service Details */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                     <Select label="Servicio" name="service_id" required>
                                         <option value="">Selecciona un servicio</option>
                                         {services.map((s) => (
@@ -99,7 +98,7 @@ export default function NewSubscription() {
                                     />
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                     <Input
                                         label="Costo Total Mensual ($)"
                                         type="number"
@@ -121,22 +120,21 @@ export default function NewSubscription() {
                                     />
                                 </div>
 
-                                <hr className="border-white/5" />
+                                <div className="hairline-top" />
 
                                 {/* Participants */}
                                 <div>
-                                    <h3 className="text-lg font-medium mb-4">Integrantes</h3>
-                                    <div className="space-y-4">
+                                    <h3 className="text-[17px] font-semibold text-text-primary mb-4">Integrantes</h3>
+                                    <div className="space-y-3">
                                         {members.map((member) => (
                                             <div
                                                 key={member.id}
-                                                className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-start p-4 sm:p-0 rounded-xl bg-white/5 sm:bg-transparent border border-white/5 sm:border-none"
+                                                className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-start p-4 rounded-[12px] bg-surface-2"
                                             >
                                                 <Input
                                                     placeholder="Nombre del amigo"
                                                     value={member.name}
                                                     onChange={(e) => updateMember(member.id, 'name', e.target.value)}
-                                                    className="text-sm"
                                                 />
                                                 <Input
                                                     placeholder="WhatsApp (Ej: 54911...)"
@@ -145,24 +143,21 @@ export default function NewSubscription() {
                                                     onChange={(e) =>
                                                         updateMember(member.id, 'whatsapp', e.target.value)
                                                     }
-                                                    className="text-sm"
                                                 />
                                                 <Input
                                                     placeholder="Email (opcional)"
                                                     type="email"
                                                     value={member.email}
                                                     onChange={(e) => updateMember(member.id, 'email', e.target.value)}
-                                                    className="text-sm"
                                                 />
                                                 {members.length > 1 && (
                                                     <Button
                                                         type="button"
                                                         variant="ghost"
                                                         onClick={() => removeMember(member.id)}
-                                                        className="self-end sm:self-auto sm:mt-1"
-                                                        title="Quitar"
+                                                        className="self-end sm:self-center shrink-0"
                                                     >
-                                                        <Trash2 size={20} />
+                                                        <Trash2 size={18} strokeWidth={1.75} />
                                                     </Button>
                                                 )}
                                             </div>
@@ -172,9 +167,9 @@ export default function NewSubscription() {
                                     <button
                                         type="button"
                                         onClick={addMember}
-                                        className="mt-4 flex items-center gap-2 text-sm text-indigo-400 hover:text-indigo-300 font-medium transition-colors"
+                                        className="mt-4 flex items-center gap-2 text-[13px] text-accent hover:text-accent-hover font-medium transition-colors"
                                     >
-                                        <Plus size={16} /> Añadir otro amigo
+                                        <Plus size={15} strokeWidth={1.75} /> Añadir otro amigo
                                     </button>
                                 </div>
                             </div>
@@ -186,32 +181,30 @@ export default function NewSubscription() {
 
                 {/* Summary Sidebar */}
                 <div className="lg:col-span-1 order-1 lg:order-2">
-                    <Card className="p-6 lg:sticky lg:top-10" variant="gradient">
-                        <h3 className="font-bold text-lg mb-6">Resumen del Grupo</h3>
+                    <Card variant="elevated" className="p-6 lg:sticky lg:top-10">
+                        <h3 className="text-[17px] font-semibold text-text-primary mb-6">Resumen del Grupo</h3>
 
                         <div className="space-y-4">
-                            <div className="flex justify-between items-center text-sm">
-                                <span className="text-zinc-400">Total Mensual</span>
-                                <span className="font-medium text-white">${totalPrice || '0.00'}</span>
+                            <div className="flex justify-between items-center text-[15px]">
+                                <span className="text-text-secondary">Total Mensual</span>
+                                <span className="font-medium text-text-primary tabular-nums">${totalPrice || '0.00'}</span>
                             </div>
-                            <div className="flex justify-between items-center text-sm">
-                                <span className="text-zinc-400">Total de Personas</span>
-                                <span className="font-medium text-white">
-                                    {numberOfPeople}{' '}
-                                    <span className="text-xs text-zinc-500 font-normal">(Incluyéndote)</span>
+                            <div className="flex justify-between items-center text-[15px]">
+                                <span className="text-text-secondary">Total de Personas</span>
+                                <span className="font-medium text-text-primary">
+                                    {numberOfPeople} <span className="text-[13px] text-text-tertiary font-normal">(Incluyéndote)</span>
                                 </span>
                             </div>
 
-                            <hr className="border-white/10 my-4" />
+                            <div className="hairline-top" />
 
                             <div className="flex justify-between items-center">
-                                <span className="font-medium text-white">Cuota por Persona</span>
-                                <span className="font-bold text-2xl text-indigo-400">${quotaPerPerson.toFixed(2)}</span>
+                                <span className="font-medium text-text-primary">Cuota por Persona</span>
+                                <span className="font-bold text-[22px] tabular-nums text-accent">${quotaPerPerson.toFixed(2)}</span>
                             </div>
 
-                            <div className="mt-6 p-4 bg-black/20 rounded-xl text-xs text-zinc-400 border border-white/5 leading-relaxed">
-                                La cuota se divide en partes iguales entre todos los amigos listados y tú como creador
-                                automáticamente.
+                            <div className="mt-6 p-4 rounded-[12px] bg-surface-2 text-[13px] text-text-tertiary leading-relaxed">
+                                La cuota se divide en partes iguales entre todos los amigos listados y tú como creador automáticamente.
                             </div>
                         </div>
                     </Card>

@@ -8,17 +8,22 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 
 export function Input({ label, error, className = '', ...props }: InputProps) {
     return (
-        <div className="space-y-2 w-full">
+        <div className="space-y-1.5 w-full">
             {label && (
-                <label className="text-sm font-medium text-zinc-300" htmlFor={props.id || props.name}>
+                <label
+                    className="block text-[13px] font-medium text-text-secondary"
+                    htmlFor={props.id || props.name}
+                >
                     {label}
                 </label>
             )}
             <input
-                className={`w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-300 ${error ? 'border-red-500/50' : ''} ${className}`}
+                className={`w-full bg-surface-2 text-text-primary placeholder:text-text-tertiary border border-border-hairline rounded-[12px] px-4 py-2.5 text-[15px] transition-all duration-150 ease-out focus-visible:outline-none focus-visible:border-accent focus-visible:ring-1 focus-visible:ring-accent disabled:opacity-40 disabled:cursor-not-allowed ${
+                    error ? 'border-danger ring-1 ring-danger/40' : ''
+                } ${className}`}
                 {...props}
             />
-            {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
+            {error && <p className="text-[13px] text-danger mt-1">{error}</p>}
         </div>
     )
 }
